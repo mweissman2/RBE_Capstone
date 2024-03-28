@@ -1,6 +1,8 @@
 from global_planner import *
 from local_planner import *
 from occupancy_map import *
+import matplotlib.path as mplpath
+import matplotlib.pyplot as plt
 
 if __name__ == "__main__":
 
@@ -13,10 +15,11 @@ if __name__ == "__main__":
 
 
     # Below is testing
-    robot_velocity = [5,0]
+    robot_velocity = [3,5]
     robot_pos = [50,40]
-    obstacle = [50,60]
-    o_velocity =[-3,3]
+    obstacles = [[50, 60]]             # [x y], needs to be list of lists, might need to convert to dictionary later
+    obstacle = obstacles[0]
+    o_velocity =[3,-3]
 
 
     # print(routes)
@@ -26,6 +29,39 @@ if __name__ == "__main__":
     o_map = OccupancyMap()
     o_map.test_grid()    # create test grid
 
+    vo_algo.update_obstacles(obstacles)
+    cone_vertices = vo_algo.vo_calculation(o_map.occupancy_grid,robot_pos,o_velocity,robot_velocity)
+    path = mplpath.Path(cone_vertices) # use this to visualize the cone construction
 
-    vo_algo.vo_calculation(o_map.occupancy_grid,robot_pos,o_velocity,robot_velocity)
-    # path = mplpath.Path(cone_vertices) # use this to visualize the cone construction
+    # Extract x and y coordinates from cone_vertices
+    x_coords = [vertex[0] for vertex in cone_vertices]
+    y_coords = [vertex[1] for vertex in cone_vertices]
+
+
+    # testing if something is inside the obstacle velocity
+    test_point = (60,42)
+    object_inside = path.contains_point(test_point)
+
+    if object_inside:
+        print(f'Point {test_point} is inside the VO')
+    else:
+        print('Not inside VO')
+
+
+
+    # Plot the points
+    plt.plot(x_coords, y_coords, 'ro')  # 'ro' specifies red circles for points
+    plt.plot(*robot_pos,'bo')
+    plt.scatter(50,60, color = 'green')
+    # Plot the path between vertices
+    for i in range(len(cone_vertices)-1):
+      plt.plot([cone_vertices[i][0], cone_vertices[i + 1][0]], [cone_vertices[i][1], cone_vertices[i + 1][1]], 'r-')
+    plt.plot([cone_vertices[2][0], cone_vertices[0][0]], [cone_vertices[2][1], cone_vertices[0][1]],'r-')   # plot last path
+    plt.xlabel('X')
+    plt.ylabel('Y')
+    plt.title('Visualization of Collision Cone Vertices')
+    plt.gca().set_aspect('equal', adjustable='box')
+    plt.grid(True)
+    plt.show()
+
+

@@ -6,7 +6,7 @@ import math
 
 # A* integration with VO: https://www.sciencedirect.com/science/article/pii/S2092678224000050
 
-import controller       # do i need to pip install?
+# import controller       # do i need to pip install?
 import numpy as np
 import matplotlib.path as mplpath
 
@@ -50,7 +50,7 @@ class velocityObstacle():
         t = 6           # this establishes 6 second future horizon window
         new_t1 = [t_1[0] + velocity_of_obstacle[0]*t,t_1[1] + velocity_of_obstacle[1]*t]
         new_t2 = [t_2[0] + velocity_of_obstacle[0]*t,t_2[1] + velocity_of_obstacle[1]*t]
-        new_apex_point = (robo_velocity - velocity_of_obstacle)*t+robot_pos      # the apex point of the obstacle would be vector shift of robot position by velocity of object minus distance covered from difference of obstacle and robot velocities.
+        new_apex_point = [(robo_velocity[0] - velocity_of_obstacle[0])*t+robot_pos[0],(robo_velocity[0] - velocity_of_obstacle[0])*t+robot_pos[0]]      # the apex point of the obstacle would be vector shift of robot position by velocity of object minus distance covered from difference of obstacle and robot velocities.
         cone_vertices = np.array([new_apex_point,new_t1,new_t2])
 
         return cone_vertices
@@ -69,7 +69,7 @@ class velocityObstacle():
         distance = self.pyth_distance(self.robot_pose, obstacle)
 
         if distance >=self.inflation_radius:
-            rho = self.inflation_radius-distance
+            rho = self.inflation_radius/distance
             ad = rho**2
             bd = rho*math.sqrt(1-rho**2)
             # calculate tangent points
@@ -86,15 +86,17 @@ class velocityObstacle():
 
     def vo_calculation(self,local_occupy_map,robot_pos,velocity_of_obstacle,robot_velocity):
         # calculate the velocity obstacle from obstacles
-        for obstacle,velocity in self.obstacles:
-            v_prime = robot_velocity - velocity            # obtain v prime vector, which velocity component from robot towards obstacle
+        cone_coordinates = []
+        self.robot_pose = robot_pos
+        for obstacle in self.obstacles:
+                        # obtain v prime vector, which velocity component from robot towards obstacle
             # create tangent lines from robot to inflated obstacle
 
             # find distance from point to obstacle center
                    # pass in robot and obstacle position
             t1, t2 = self.tangent_calc(obstacle, self.robot_pose)
             cone_coordinates = self.collision_cone(local_occupy_map,robot_pos,t1,t2,velocity_of_obstacle,robot_velocity)
-
+        return cone_coordinates
 
         # create
 

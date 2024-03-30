@@ -13,14 +13,16 @@ class OccupancyMap:
         self.width = width
         self.occupancy_grid = np.zeros((self.length,self.width),dtype = int)
         #self.verteces = verteces
-
+        self.list_of_obstacle_coordinates = []
 
 
     def test_grid(self):
         # create test array for obstacle velocity
-        self.length = 100
-        self.width = 100 
+        self.length = 20
+        self.width = 20 
         self.occupancy_grid = np.zeros((self.length,self.width),dtype = int)
+        self.occupancy_grid[4][5],self.occupancy_grid[6][7], self.occupancy_grid[1][3] = 1
+
 
         # put some random obtacles in it
     def discretize_grid(self,obstacle_paths):
@@ -34,7 +36,8 @@ class OccupancyMap:
                     object_detected = polygon.contains_point([i,k])
                     if object_detected:
                         self.occupancy_grid[i][k] = 1
-                        print(f'Point {[i,k]} is inside the VO')
+                        # print(f'Point {[i,k]} is inside the VO')
+                        self.list_of_obstacle_coordinates.append([k,i])
                     else:
                         self.occupancy_grid[i][k] = 0
                         # print('Not inside VO')

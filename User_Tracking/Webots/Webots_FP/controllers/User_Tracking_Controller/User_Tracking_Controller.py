@@ -82,7 +82,6 @@ while robot.step(timestep) != -1:
         i = 0
     i += 1
     key = keyboard.getKey()
-    print(key)
     if key==80: #letter p
         break
 

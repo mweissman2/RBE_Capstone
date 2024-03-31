@@ -35,8 +35,8 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation 0.2756968637433008 0.19687812290080908 -0.9408667514824625 1.5983381779500856
-  position -1.4151518965832621 10.906006383307659 5.712389554543752
+  orientation 0.17344091259768737 0.09029667820733125 -0.9806960587980371 1.566625759633851
+  position -2.1030736681498143 16.005069815416835 6.084702330704476
 }
 TexturedBackground {
 }
@@ -116,6 +116,8 @@ DEF DOG Robot {
         Solid {
           translation 0 0 0.15
           children [
+            Speaker {
+            }
             Shape {
               appearance MattePaint {
                 baseColor 0 0.333333 0
@@ -136,6 +138,7 @@ DEF DOG Robot {
           }
           device [
             RotationalMotor {
+              name "front_right_wheel"
             }
             PositionSensor {
             }
@@ -168,6 +171,7 @@ DEF DOG Robot {
           }
           device [
             RotationalMotor {
+              name "front_left_wheel"
             }
             PositionSensor {
             }
@@ -192,6 +196,7 @@ DEF DOG Robot {
           }
           device [
             RotationalMotor {
+              name "back_right_wheel"
             }
             PositionSensor {
             }
@@ -216,6 +221,7 @@ DEF DOG Robot {
           }
           device [
             RotationalMotor {
+              name "back_left_wheel"
             }
             PositionSensor {
             }
@@ -247,7 +253,7 @@ DEF DOG Robot {
           ]
           endPoint Solid {
             translation -0.12 0 0.2
-            rotation 9.024993567198802e-17 1 0 4.692706653739929e-06
+            rotation 9.0249935671988e-17 0.9999999999999999 0 4.692706653739929e-06
             children [
               HingeJoint {
                 jointParameters HingeJointParameters {
@@ -350,7 +356,7 @@ DEF DOG Robot {
   ]
   physics Physics {
   }
-  controller "<extern>"
+  controller "robot_motion_controller"
   supervisor TRUE
 }
 Robot {
@@ -358,4 +364,26 @@ Robot {
   name "supervisor1"
   controller "supervisor_controller"
   supervisor TRUE
+}
+Robot {
+  children [
+    Solid {
+      children [
+        Emitter {
+        }
+        Receiver {
+        }
+        Shape {
+          appearance MattePaint {
+            baseColor 0 1 0
+          }
+          geometry Cone {
+            bottomRadius 0.09
+            height 0.3
+          }
+        }
+      ]
+    }
+  ]
+  name "remote_server"
 }

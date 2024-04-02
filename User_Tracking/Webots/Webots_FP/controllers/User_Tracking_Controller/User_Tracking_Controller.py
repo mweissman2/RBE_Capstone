@@ -8,6 +8,7 @@ from controller import Keyboard
 import Gimbal_Controller as GC
 import csv
 
+
 robot = Supervisor()
 #get ID of user for tracking.
 user_node = robot.getFromDef('USER')
@@ -89,3 +90,5 @@ while robot.step(timestep) != -1:
 
 # Enter here exit cleanup code.
 csv_file.close()
+
+#read csv file and plot with matplotlib

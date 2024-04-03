@@ -36,10 +36,11 @@ class Gimbal_Controller:
         self.velocity_buffer_index = 0
         self.prev_position = [-2,0]
         self.next_position = [0,0]
+        self.prev_velocity = [0,0]
 
         self.current_yaw_axis_angle = 0
         self.current_pitch_axis_angle = 0
-        self.yaw_pid = [0.35, 0.03, 0]
+        self.yaw_pid = [0.45, 0.03, 0]
         self.yaw_pid_errors = [0,0] #last error, error sum
         self.pitch_pid = [0.35 , 0, 0]
         self.pitch_pid_errors = [0, 0]  #last error, error sum
@@ -47,9 +48,11 @@ class Gimbal_Controller:
         self.user_id = 30
 
 
+    #function which represents finding the user in an initial setup
     def set_user_id(self, user_id):
         self.user_id = user_id
 
+    #runs the PID loop to move the gimbal module to center the user in the frame and the measures their position
     def center_user(self, user_position_in_image, good_frame):
         #normalize inputs
         x_input = (float(user_position_in_image[0])/self.cam_horizontal_res) - 0.5
@@ -73,8 +76,11 @@ class Gimbal_Controller:
         #if within an error threshold for image centering, #then calculate depth and angle
         if np.abs(xn_setpoint-x_input) < self.center_error_margin:
             user_location = self.get_user_location(good_frame)
+        else:
+            user_location = self.estimate_next_position(self.prev_position, self.prev_velocity)
 
 
+    #calculates the depth and angle and calculates the user position
     def get_user_location(self, good_frame):
         #calculate depth
         depth = self.calculate_depth(good_frame)
@@ -90,6 +96,7 @@ class Gimbal_Controller:
         return (curr_position, curr_velocity)
 
 
+    #coarse function for finding the user within world if they are not in frame
     def find_user(self):
         self.update_sensor_readings()
         good_frame = []
@@ -115,6 +122,7 @@ class Gimbal_Controller:
             new_angle = self.current_yaw_axis_angle + (self.last_direction*0.35)
             self.yaw_axis_motor.setPosition(new_angle)
 
+    #function for applying mask to image for depth measurement
     def segment_image(self, image):
         #remove infinity from array
         image[image > 100] = 0
@@ -131,6 +139,7 @@ class Gimbal_Controller:
 
         return masked_image, pixel_count
 
+    #averages together all depth readings for detected object
     def calculate_depth(self,depth_image):
         depth = -1
         # get depth image
@@ -144,6 +153,7 @@ class Gimbal_Controller:
         #print(depth)
         #average together readings from depth image
         return depth
+
 
     def get_depth_image(self):
         image_c_ptr = self.depth_camera.getRangeImage(data_type="buffer")
@@ -160,8 +170,8 @@ class Gimbal_Controller:
         self.current_pitch_axis_angle = self.pitch_axis_motor.getPositionSensor().getValue()
 
     def calculate_user_position(self, depth, angle):
-        x_pos = depth*math.cos(angle+np.pi)
-        y_pos = depth*math.sin(angle++np.pi)
+        x_pos = depth*math.cos(angle+np.pi) #pi is added to align gimbal frame to robot frame
+        y_pos = depth*math.sin(angle+np.pi)
 
         return x_pos, y_pos
 
@@ -185,6 +195,7 @@ class Gimbal_Controller:
         x_vel = np.average(self.x_velocity_buffer)
         y_vel = np.average(self.y_velocity_buffer)
         #print(x_vel, y_vel)
+        self.prev_velocity = [x_vel, y_vel]
 
         return x_vel, y_vel
 

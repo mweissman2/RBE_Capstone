@@ -7,7 +7,9 @@ from controller import Supervisor
 from controller import Keyboard
 import Gimbal_Controller as GC
 import csv
+import os
 
+cwd = os.path.dirname(__file__)
 
 robot = Supervisor()
 #get ID of user for tracking.
@@ -17,9 +19,9 @@ user_id = user_node.getId()
 #my_robot = robot.getFromDef('DOG')
 
 #logging data from file
-csv_file = open('User_Tracking_Data.csv', 'w', newline='')
+csv_file = open(cwd + '\\User_Tracking_Data.csv', 'w', newline='')
 csv_writer = csv.writer(csv_file)
-header = ['Actual X Pos', 'Actual Y Pos', 'Timestep', 'Measured X Pos', 'Measured Y Pos', 'Timestep']
+header = ['Actual X Pos', 'Actual Y Pos', 'Timestep', 'Measured X Pos', 'Measured Y Pos', 'Is_Tracking']
 csv_writer.writerow(header)
 
 #enable keboard for exiting program
@@ -92,3 +94,4 @@ while robot.step(timestep) != -1:
 csv_file.close()
 
 #read csv file and plot with matplotlib
+#exec(open(cwd+ '\\user_tracking_plotter.py').read())

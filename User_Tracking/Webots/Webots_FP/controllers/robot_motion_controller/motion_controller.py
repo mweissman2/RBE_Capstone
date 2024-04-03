@@ -17,9 +17,20 @@ class MotionController:
         self.l_x = 0.5
         self.l_y = 0.5
 
+        self.x_vel_traj = []
+        self.y_vel_traj = []
+        self.z_vel_traj = []
+        self.x_positions = []
+        self.y_positions = []
+        self.z_positions = []
+        self.trajectory_index = 0
+        self.max_index = 0
+
+        self.finished_flag = False
+
     #input array is [vx,vy,wz]
-    def set_velocity(self, velocity_array):
-        wheel_velocities = self.inverse_kinematics(velocity_array[0], velocity_array[1], velocity_array[2])
+    def set_velocity(self, vx, vy, wz):
+        wheel_velocities = self.inverse_kinematics(vx, vy, wz)
 
         #need to be set to inf for velocity control to work
         self.inside_wheel_front.setPosition(float('inf'))
@@ -91,10 +102,26 @@ class MotionController:
     def get_encoder_reading(self, wheel):
         return 0
 
+    def send_next_step(self):
+        #if the first index in the array send to robot to go forward
+        if self.trajectory_index == 0:
+            self.set_velocity(self.x_vel_traj[0], self.y_vel_traj[0], self.z_vel_traj[0])
+        else:
+            #else see if we are close the expected position set point, then send next index
+            if abs(self.current_position[0]-self.x_positions[self.trajectory_index]) < self.error_epsilon:
+                if abs(self.current_position[1]-self.y_positions[self.trajectory_index]) < self.error_epsilon:
+                    if abs(self.current_position[2]-self.z_positions[self.trajectory_index]) < self.error_epsilon*5: #heading error is less important
+                        self.trajectory_index += 1
+                        if self.trajectory_index < self.max_index:
+                            self.set_velocity(self.x_vel_traj[self.trajectory_index], self.y_vel_traj[self.trajectory_index], self.z_vel_traj[self.trajectory_index])
+                        else:
+                            return self.at_goal_position()
+
     def at_goal_position(self):
         if abs(self.current_position[0]-self.goal_position[0]) < self.error_epsilon:
             if abs(self.current_position[1]-self.goal_position[1]) < self.error_epsilon:
                 if abs(self.current_position[2]-self.goal_position[2]) < self.error_epsilon*5: #heading error is less important
+                    self.finished_flag = True
                     return True
 
         return False
@@ -106,7 +133,6 @@ class MotionController:
         #if within error bounds, move to next spot
         #else keep moving
         #
-        return False
 
     def inverse_kinematics(self, x_vel, y_vel, z_vel):
         inv_kin = np.array([[1, -1, -(self.l_x+self.l_y)],
@@ -139,7 +165,10 @@ class MotionController:
         return x_traj, xd_traj, xdd_traj
 
     def plan_trajectory(self, final_points, end_velocity, time):
-        [x_traj, xd_traj, xdd_traj] = self.quintic_trajectory(self.current_position[0], final_points[0], self.current_velocity[0],end_velocity[0],0,0,time, 10)
-        [y_traj, yd_traj, ydd_traj] = self.quintic_trajectory(self.current_position[1], final_points[1], self.current_velocity[1],end_velocity[1],0,0,time, 10)
-        [w_traj, wd_traj, wdd_traj] = self.quintic_trajectory(self.current_position[2], final_points[2], self.current_velocity[2],end_velocity[2],0,0,time, 10)
+        self.finished_flag = False
+        [self.x_positions, self.x_vel_traj, xdd_traj] = self.quintic_trajectory(self.current_position[0], final_points[0], self.current_velocity[0],end_velocity[0],0,0,time, 10)
+        [self.y_positions, self.y_vel_traj, ydd_traj] = self.quintic_trajectory(self.current_position[1], final_points[1], self.current_velocity[1],end_velocity[1],0,0,time, 10)
+        [self.z_positions, self.z_vel_traj, wdd_traj] = self.quintic_trajectory(self.current_position[2], final_points[2], self.current_velocity[2],end_velocity[2],0,0,time, 10)
+        self.trajectory_index = 0
+        self.max_index = len(self.x_positions)
 

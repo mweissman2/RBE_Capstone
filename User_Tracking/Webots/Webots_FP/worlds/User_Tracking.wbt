@@ -356,7 +356,7 @@ DEF DOG Robot {
   ]
   physics Physics {
   }
-  controller "robot_motion_controller"
+  controller "<extern>"
   supervisor TRUE
 }
 Robot {

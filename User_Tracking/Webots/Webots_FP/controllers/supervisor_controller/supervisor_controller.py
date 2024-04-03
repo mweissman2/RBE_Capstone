@@ -76,8 +76,9 @@ class Pedestrian ():
     def update_postion(self, trans, rot, timestep):
         time_delta = timestep/1000
         angle = self.rotation
-        dx = math.cos(angle)*self.velocity
-        dy = math.sin(angle)*self.velocity
+        #
+        dx = math.cos(angle)*self.velocity*time_delta
+        dy = math.sin(angle)*self.velocity*time_delta
         new_trans = [trans[0]+dx, trans[1]+dy, trans[2]]
         new_rot = [rot[0], rot[1], rot[2], angle]
         return new_trans, new_rot
@@ -90,23 +91,23 @@ class Pedestrian ():
             stop_boolean = True
             print("person stopped")
         elif key == 87: #if w then speed up
-            self.velocity += 0.01
+            self.velocity += 0.05
             if self.velocity >= self.max_velocity:
                self.velocity = self.max_velocity
             print(self.velocity)
         elif key == 83: #if s then slow down
-            self.velocity -= 0.01
+            self.velocity -= 0.05
             if self.velocity < 0:
                 self.velocity = 0
             print(self.velocity)
         elif key == 65:
             #rotate left
             self.rotation +=0.17 #10 degrees
-            print('rotating left')
+            #print('rotating left')
         elif key == 68:
             #rotate right
             self.rotation -= 0.17  # 10 degrees
-            print('rotating right')
+            #print('rotating right')
             
         return stop_boolean
 

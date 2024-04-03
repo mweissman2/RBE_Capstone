@@ -23,7 +23,7 @@ print(names)
 for row in csv_reader:
     print(row)
     x_pos_actual.append(float(row['Actual X Pos']))
-    y_pos_actual.append(float(row['Actual X Pos']))
+    y_pos_actual.append(float(row['Actual Y Pos']))
     time_actual.append(float(row['Timestep']))
     x_pos_measured.append(float(row['Measured X Pos']))
     y_pos_measured.append(float(row['Measured Y Pos']))
@@ -40,14 +40,26 @@ y_error = np.divide(y_pos_measured-y_pos_actual, y_pos_actual) * 100
 
 plt.plot(time_actual, x_error)
 plt.plot(time_actual, y_error)
+plt.xlabel("Simulation Time")
+plt.ylabel("error (%)")
+plt.legend(["X Error", "Y Error"])
+plt.title("Position Estimation Error vs Time")
 plt.show()
 
 plt.plot(time_actual, x_pos_measured)
 plt.plot(time_actual, x_pos_actual)
+plt.legend(["Measured Position", "Actual Position"])
+plt.xlabel("Simulation Time")
+plt.ylabel("X Position (Meters)")
+plt.title("X position measurements vs time")
 plt.show()
 
 plt.plot(time_actual, y_pos_measured)
 plt.plot(time_actual, y_pos_actual)
+plt.xlabel("Simulation Time")
+plt.ylabel("Y Position (Meters)")
+plt.legend(["Measured Position", "Actual Position"])
+plt.title("Y position measurements vs time")
 plt.show()
 
 

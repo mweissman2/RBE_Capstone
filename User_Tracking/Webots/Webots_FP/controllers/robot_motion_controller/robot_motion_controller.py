@@ -22,6 +22,8 @@ wheel_names = ['front_left_wheel', 'front_right_wheel', 'back_left_wheel', 'back
 for name in wheel_names:
     wheels.append(robot.getDevice(name))
 
+GPS = robot.getDevice('gps')
+GPS.enable(timestep)
 keyboard = Keyboard()
 keyboard.enable(100)
     
@@ -30,7 +32,8 @@ vy = 0
 wz = 0
 #create the reference to motion controller
 my_controller = MC.MotionController(wheels[0],wheels[1],wheels[2],wheels[3])
- 
+
+first = True
 # Main loop:
 # - perform simulation steps until Webots is stopping the controller
 while robot.step(timestep*4) != -1:
@@ -52,8 +55,14 @@ while robot.step(timestep*4) != -1:
         wz -= 0.5
 
     vels = [vx,vy,wz]
-    print(vels)
-    my_controller.set_velocity(vels)
+
+    if first:
+        #next_point = input("What is the desired point")
+        my_controller.plan_trajectory([2,4,0], [0.3,0.3,0], 3)
+        first = False
+
+    my_controller.set_current_position(GPS.getValues())
+    my_controller.send_next_step()
     # Process sensor data here.
 
     # Enter here functions to send actuator commands, like:

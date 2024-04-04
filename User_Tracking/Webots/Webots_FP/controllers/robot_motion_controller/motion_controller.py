@@ -11,7 +11,7 @@ class MotionController:
         self.current_position = [0,0,0]
         self.current_velocity = [0,0,0]
         self.goal_position = [0,0,0]
-        self.error_epsilon = 0.1
+        self.error_epsilon = 0.5
         self.current_heading = 0
         self.wheel_radius = 3.15
         self.l_x = 0.5
@@ -30,6 +30,7 @@ class MotionController:
 
     #input array is [vx,vy,wz]
     def set_velocity(self, vx, vy, wz):
+        print([vx, vy, wz])
         wheel_velocities = self.inverse_kinematics(vx, vy, wz)
 
         #need to be set to inf for velocity control to work
@@ -102,10 +103,14 @@ class MotionController:
     def get_encoder_reading(self, wheel):
         return 0
 
+    def set_current_position(self, position):
+        self.current_position = position
+
     def send_next_step(self):
         #if the first index in the array send to robot to go forward
         if self.trajectory_index == 0:
-            self.set_velocity(self.x_vel_traj[0], self.y_vel_traj[0], self.z_vel_traj[0])
+            self.set_velocity(self.x_vel_traj[1], self.y_vel_traj[1], self.z_vel_traj[1])
+            self.trajectory_index += 1
         else:
             #else see if we are close the expected position set point, then send next index
             if abs(self.current_position[0]-self.x_positions[self.trajectory_index]) < self.error_epsilon:
@@ -149,7 +154,7 @@ class MotionController:
         inputs = np.array([x_i, x_f, xd_i, xd_f, xdd_i, xdd_f]).reshape(6,1)
 
         matrix = np.array([[0,0,0,0,0,1],
-                           [np.power(t,5), np.power(t,4), np.power(t,3), np.power(t,2), 1],
+                           [np.power(t,5), np.power(t,4), np.power(t,3), np.power(t,2), t, 1],
                           [0,0,0,0,1,0],
                           [5*np.power(t,4), 4*np.power(t,3), 3*np.power(t,2), 2*t, 1, 0],
                           [0,0,0,2,0,0],
@@ -164,11 +169,13 @@ class MotionController:
 
         return x_traj, xd_traj, xdd_traj
 
-    def plan_trajectory(self, final_points, end_velocity, time):
+    def plan_trajectory(self, final_points, end_velocities, time):
+
+        [self.x_positions, self.x_vel_traj, xdd_traj] = self.quintic_trajectory(self.current_position[0], final_points[0], self.current_velocity[0],end_velocities[0],0,0,time, 10)
+        [self.y_positions, self.y_vel_traj, ydd_traj] = self.quintic_trajectory(self.current_position[1], final_points[1], self.current_velocity[1],end_velocities[1],0,0,time, 10)
+        [self.z_positions, self.z_vel_traj, wdd_traj] = self.quintic_trajectory(self.current_position[2], final_points[2], self.current_velocity[2],end_velocities[2],0,0,time, 10)
+        #reset trajectory status flags
         self.finished_flag = False
-        [self.x_positions, self.x_vel_traj, xdd_traj] = self.quintic_trajectory(self.current_position[0], final_points[0], self.current_velocity[0],end_velocity[0],0,0,time, 10)
-        [self.y_positions, self.y_vel_traj, ydd_traj] = self.quintic_trajectory(self.current_position[1], final_points[1], self.current_velocity[1],end_velocity[1],0,0,time, 10)
-        [self.z_positions, self.z_vel_traj, wdd_traj] = self.quintic_trajectory(self.current_position[2], final_points[2], self.current_velocity[2],end_velocity[2],0,0,time, 10)
         self.trajectory_index = 0
         self.max_index = len(self.x_positions)
 

@@ -2,6 +2,7 @@ from multiprocessing import Queue
 import google.generativeai as genai
 from Communication import utils
 from Communication.Comms_output.Text_to_speech import tts_via_request
+from Communication.Comms_output.ImageCaptioner import get_image, describe_image, few_shot_describe_image
 
 
 def response_subscriber(response_q):
@@ -13,7 +14,14 @@ def response_subscriber(response_q):
         try:
             # Pull audio from queue
             latest_response = response_q.get(block=True)
-            refined_response = response_refiner(latest_response)
+
+            # Get image caption:
+            img = get_image('Communication/imgs')
+            context = describe_image(img)
+            # context = few_shot_describe_image(img)
+
+            # Refine response and call text to speech
+            refined_response = response_refiner(latest_response, context)
             tts_via_request(refined_response)
         except KeyboardInterrupt:
             break
@@ -34,24 +42,7 @@ def response_refiner(response_raw: str, context: str = "There is a cyclist up ah
         max_output_tokens=2048,
     )
 
-    safety_settings = [
-        {
-            "category": "HARM_CATEGORY_HARASSMENT",
-            "threshold": "block_none"
-        },
-        {
-            "category": "HARM_CATEGORY_HATE_SPEECH",
-            "threshold": "block_none"
-        },
-        {
-            "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-            "threshold": "block_none"
-        },
-        {
-            "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
-            "threshold": "block_none"
-        },
-    ]
+    safety_settings = utils.set_gemini_safety_settings()
 
     model = genai.GenerativeModel(model_name="gemini-pro",
                                   # generation_config=generation_config,

@@ -54,11 +54,11 @@ def destination_search(text_query: str, location: tuple, radius: float = 1609.34
         #     json.dump(data, outfile, indent=4)
 
         # Loop through results and print basic information
-        for place in data["places"]:
-            print(f"Name: {place['displayName']['text']}")
-            print(f"Address: {place['formattedAddress']}")
-            print(f"Location: {place['location']}")
-            print()
+        # for place in data["places"]:
+        #     print(f"Name: {place['displayName']['text']}")
+        #     print(f"Address: {place['formattedAddress']}")
+        #     print(f"Location: {place['location']}")
+        #     print()
 
         # Return Top place (dictionary)
         return data['places'][0]
@@ -73,14 +73,14 @@ def get_gps_coords():
     return 42.27377897661122, -71.80928749664702
 
 
-# Define search term
-search_term = "grocery store near WPI"
-
-# Get current position
-lat, long = get_gps_coords()
-
-# Run search
-top_place = destination_search(search_term, location=(lat, long))
-print(f"TOP PLACE: {top_place['displayName']['text']} \n"
-      f"{top_place['formattedAddress']} \n"
-      f"{top_place['location']}")
+# # Define search term
+# search_term = "grocery store near WPI"
+#
+# # Get current position
+# lat, long = get_gps_coords()
+#
+# # Run search
+# top_place = destination_search(search_term, location=(lat, long))
+# print(f"TOP PLACE: {top_place['displayName']['text']} \n"
+#       f"{top_place['formattedAddress']} \n"
+#       f"{top_place['location']}")

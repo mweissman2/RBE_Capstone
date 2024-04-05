@@ -81,7 +81,7 @@ def transcribe_audio(client, audio_q):
     return result
 
 
-def run_audio(audio_q, text_q, keyword_path):
+def run_audio(audio_q, transcription_q, keyword_path):
     """
   Main function that coordinates wakeword detection, recording, and transcription.
   """
@@ -105,7 +105,7 @@ def run_audio(audio_q, text_q, keyword_path):
                 transcription = transcribe_audio(client, audio_q)
 
                 # Push transcription to queue
-                text_q.put(transcription)
+                transcription_q.put(transcription)
                 print(f"Transcription: {transcription}")
         except KeyboardInterrupt:
             break

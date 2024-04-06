@@ -1,36 +1,55 @@
 from controller import robot
 import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib
+
+matplotlib.use('TkAgg')
+
+data_len = 200
 
 class MotionController:
-    def __init__(self, wheel1, wheel2, wheel3, wheel4):
+    def __init__(self, wheel1, wheel2, wheel3, wheel4, localization, heading):
         self.inside_wheel_front = wheel1 #front left
         self.inside_wheel_back = wheel4 #back right
         self.outside_wheel_front = wheel2 #front right
         self.outside_wheel_back = wheel3 #back left
+        self.localization = localization
+        self.heading = heading
 
+        self.time_steps = 4
         self.current_position = [0,0,0]
         self.current_velocity = [0,0,0]
         self.goal_position = [0,0,0]
-        self.error_epsilon = 0.5
+        self.error_epsilon = 0.3
+        self.heading_epsilon = 0.2
         self.current_heading = 0
-        self.wheel_radius = 3.15
-        self.l_x = 0.5
-        self.l_y = 0.5
+        self.wheel_radius = 0.125
+        self.l_x = 0.2
+        self.l_y = 0.2
+
+        self.x_array = []
+        self.y_array = []
+        self.x_goal = []
+        self.y_goal = []
 
         self.x_vel_traj = []
         self.y_vel_traj = []
         self.z_vel_traj = []
+        self.time_interval = 0
         self.x_positions = []
         self.y_positions = []
         self.z_positions = []
         self.trajectory_index = 0
         self.max_index = 0
 
+        self.fig, (self.ax1, self.ax2) = plt.subplots(2,1)
+        #self.line, = self.ax.plot(list(range(0,200)), [0]*200)
+
         self.finished_flag = False
 
     #input array is [vx,vy,wz]
     def set_velocity(self, vx, vy, wz):
-        print([vx, vy, wz])
+        #print([vx, vy, wz])
         wheel_velocities = self.inverse_kinematics(vx, vy, wz)
 
         #need to be set to inf for velocity control to work
@@ -103,47 +122,54 @@ class MotionController:
     def get_encoder_reading(self, wheel):
         return 0
 
-    def set_current_position(self, position):
-        self.current_position = position
+    def set_current_position(self):
+        pose = self.localization.getValues()
+        heading = self.heading.getRollPitchYaw()
+        self.current_position = [pose[0], pose[1], heading[2]]
 
-    def send_next_step(self):
-        #if the first index in the array send to robot to go forward
-        if self.trajectory_index == 0:
-            self.set_velocity(self.x_vel_traj[1], self.y_vel_traj[1], self.z_vel_traj[1])
-            self.trajectory_index += 1
-        else:
-            #else see if we are close the expected position set point, then send next index
-            if abs(self.current_position[0]-self.x_positions[self.trajectory_index]) < self.error_epsilon:
-                if abs(self.current_position[1]-self.y_positions[self.trajectory_index]) < self.error_epsilon:
-                    if abs(self.current_position[2]-self.z_positions[self.trajectory_index]) < self.error_epsilon*5: #heading error is less important
+    def send_next_step(self, velocity_goal):
+        self.set_current_position()
+        if self.finished_flag == False:
+            print(self.trajectory_index)
+
+            if abs(self.current_position[0] - self.x_positions[self.trajectory_index]) <= self.error_epsilon:
+                if abs(self.current_position[1] - self.y_positions[self.trajectory_index]) <= self.error_epsilon:
+                    if abs(self.current_position[2] - self.z_positions[self.trajectory_index]) <= self.heading_epsilon:  # heading error is less important
                         self.trajectory_index += 1
-                        if self.trajectory_index < self.max_index:
-                            self.set_velocity(self.x_vel_traj[self.trajectory_index], self.y_vel_traj[self.trajectory_index], self.z_vel_traj[self.trajectory_index])
-                        else:
-                            return self.at_goal_position()
+                        if self.trajectory_index >= self.max_index:
+                            self.trajectory_index -= 1
+                            print("At Goal")
+                            self.at_goal_position()
+                            return False
+
+            x_vel_setpoint = self.calc_velocity_setpoint(self.current_position[0], self.x_positions[self.trajectory_index], self.time_interval, 20)
+            y_vel_setpoint = self.calc_velocity_setpoint(self.current_position[1], self.y_positions[self.trajectory_index], self.time_interval, 20)
+            z_vel_setpoint = self.calc_velocity_setpoint(self.current_position[2], self.z_positions[self.trajectory_index], self.time_interval, 20)
+
+            #normalize vectors
+            mag = np.sqrt(x_vel_setpoint ** 2 + y_vel_setpoint ** 2)
+
+            # set new velocity values
+            x_vel_setpoint = velocity_goal * (x_vel_setpoint / mag)
+            y_vel_setpoint = velocity_goal * (y_vel_setpoint / mag)
+
+            self.set_velocity(x_vel_setpoint, y_vel_setpoint,z_vel_setpoint)
+            return True
+        else:
+            print("need new trajectory")
+            return False
 
     def at_goal_position(self):
-        if abs(self.current_position[0]-self.goal_position[0]) < self.error_epsilon:
-            if abs(self.current_position[1]-self.goal_position[1]) < self.error_epsilon:
-                if abs(self.current_position[2]-self.goal_position[2]) < self.error_epsilon*5: #heading error is less important
-                    self.finished_flag = True
-                    return True
+        self.finished_flag = True
+        self.set_velocity(0,0,0)
 
         return False
-        #checkfoward kinematics more weight
-        #check GPS position less weight
-
-
-        # then check compass
-        #if within error bounds, move to next spot
-        #else keep moving
-        #
 
     def inverse_kinematics(self, x_vel, y_vel, z_vel):
         inv_kin = np.array([[1, -1, -(self.l_x+self.l_y)],
                             [1, 1, (self.l_x+self.l_y)],
                             [1, 1, -(self.l_x+self.l_y)],
-                            [1, -1, (self.l_x+self.l_y)]], dtype=np.float64)
+                            [1, -1, (self.l_x+self.l_y)]], dtype=np.float64) / self.wheel_radius
 
         vels = np.array([x_vel, y_vel, z_vel]).reshape(3,1)
         [wfl, wfr, wbl, wbr] = np.matmul(inv_kin, vels)
@@ -170,12 +196,40 @@ class MotionController:
         return x_traj, xd_traj, xdd_traj
 
     def plan_trajectory(self, final_points, end_velocities, time):
-
-        [self.x_positions, self.x_vel_traj, xdd_traj] = self.quintic_trajectory(self.current_position[0], final_points[0], self.current_velocity[0],end_velocities[0],0,0,time, 10)
-        [self.y_positions, self.y_vel_traj, ydd_traj] = self.quintic_trajectory(self.current_position[1], final_points[1], self.current_velocity[1],end_velocities[1],0,0,time, 10)
-        [self.z_positions, self.z_vel_traj, wdd_traj] = self.quintic_trajectory(self.current_position[2], final_points[2], self.current_velocity[2],end_velocities[2],0,0,time, 10)
+        self.set_current_position()
+        [self.x_positions, self.x_vel_traj, xdd_traj] = self.quintic_trajectory(self.current_position[0], final_points[0], self.current_velocity[0],end_velocities[0],0,0,time, self.time_steps)
+        [self.y_positions, self.y_vel_traj, ydd_traj] = self.quintic_trajectory(self.current_position[1], final_points[1], self.current_velocity[1],end_velocities[1],0,0,time, self.time_steps)
+        [self.z_positions, self.z_vel_traj, wdd_traj] = self.quintic_trajectory(self.current_position[2], final_points[2], self.current_velocity[2],end_velocities[2],0,0,time, self.time_steps)
         #reset trajectory status flags
+       # time = np.linspace(0,time, self.time_steps)
+        self.time_interval = time/self.time_steps
         self.finished_flag = False
-        self.trajectory_index = 0
+        self.trajectory_index = 1
         self.max_index = len(self.x_positions)
 
+    def plot(self):
+        self.x_array.append(self.current_position[0])
+        #self.x_array = self.x_array[-200:]
+        self.y_array.append(self.current_position[1])
+        #self.y_array = self.y_array[-200:]
+        # print('Goal')
+        self.x_goal.append(self.x_positions[self.trajectory_index])
+        #self.x_goal = self.x_goal[-200:]
+        self.y_goal.append(self.y_positions[self.trajectory_index])
+        #self.y_goal = self.y_goal[-200:]
+        # self.line.set_data(self.x_array, self.y_array)
+        self.ax1.plot(self.y_goal)
+        self.ax1.plot(self.y_array)
+        self.ax2.plot(self.x_array)
+        self.ax2.plot(self.x_goal)
+        #self.ax1.set_xlim([-5, 5])
+        #self.ax1.set_ylim([-5, 5])
+        plt.show(block=False)
+        plt.pause(0.001)
+
+    def calc_velocity_setpoint(self, current_position, set_position, time_interval, saturation):
+        current_velocity = (set_position - current_position) / time_interval
+        if current_velocity > saturation:
+            current_velocity = saturation
+
+        return current_velocity

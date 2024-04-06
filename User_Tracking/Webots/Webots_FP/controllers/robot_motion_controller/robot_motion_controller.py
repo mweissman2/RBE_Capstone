@@ -26,17 +26,21 @@ GPS = robot.getDevice('gps')
 GPS.enable(timestep)
 keyboard = Keyboard()
 keyboard.enable(100)
+
+heading = robot.getDevice('imu')
+heading.enable(timestep)
     
 vx = 0
 vy = 0
 wz = 0
 #create the reference to motion controller
-my_controller = MC.MotionController(wheels[0],wheels[1],wheels[2],wheels[3])
+my_controller = MC.MotionController(wheels[0],wheels[1],wheels[2],wheels[3], GPS, heading)
 
 first = True
 # Main loop:
+iterations = 0
 # - perform simulation steps until Webots is stopping the controller
-while robot.step(timestep*4) != -1:
+while robot.step(timestep*3) != -1:
     # Read the sensors:
     # Enter here functions to read sensor data, like:
     #  val = ds.getValue()
@@ -55,14 +59,23 @@ while robot.step(timestep*4) != -1:
         wz -= 0.5
 
     vels = [vx,vy,wz]
+    #print(vels)
+    #my_controller.set_velocity(vx,vy,wz)
 
     if first:
         #next_point = input("What is the desired point")
-        my_controller.plan_trajectory([2,4,0], [0.3,0.3,0], 3)
+        my_controller.plan_trajectory([2,4,0.36], [0.25,0.25,0], 10)
         first = False
 
-    my_controller.set_current_position(GPS.getValues())
-    my_controller.send_next_step()
+    done_flag = my_controller.send_next_step(0.5)
+    if done_flag == False:
+        my_controller.plan_trajectory([0,0,0], [0.25,0.25,0], 10)
+
+    iterations += 1
+    if iterations >= 10:
+        iterations = 0
+        my_controller.plot()
+
     # Process sensor data here.
 
     # Enter here functions to send actuator commands, like:

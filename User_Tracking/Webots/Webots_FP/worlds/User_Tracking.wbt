@@ -35,8 +35,8 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation 0.17344091259768737 0.09029667820733125 -0.9806960587980371 1.566625759633851
-  position -2.1030736681498143 16.005069815416835 6.084702330704476
+  orientation -0.07606350504730733 0.3886576659610072 0.918237203498998 1.6679828536722927
+  position -0.09890424660908673 -5.965400772348735 3.8694080560123756
 }
 TexturedBackground {
 }
@@ -51,7 +51,7 @@ DEF USER Pedestrian {
   enableBoundingObject TRUE
 }
 Solid {
-  translation 0.67 0 0.0934252748951154
+  translation 0.67 0 0.09342527489501846
   children [
     Shape {
       appearance PBRAppearance {
@@ -64,13 +64,17 @@ Solid {
   boundingObject USE BALL_GEOMETRY
   physics Physics {
   }
+  linearVelocity 0 0 -3.0292858045172813e-12
 }
 DEF DOG Robot {
-  translation -1.06664 1.04566 0.25
+  translation -1.04664 1.01566 0.27995455999999996
   children [
     DEF ROBOT_BASE Solid {
       translation 0 0 -0.0016935350243008074
       children [
+        InertialUnit {
+          name "imu"
+        }
         Solid {
           translation 0.28 0 -0.00999987
           rotation 0 1 0 -1.5707953071795862
@@ -144,8 +148,8 @@ DEF DOG Robot {
             }
           ]
           endPoint Solid {
-            translation 0.19999999999999996 -0.19999999999999996 -0.15
-            rotation 1 -7.115210411036404e-10 7.115236072191825e-10 1.5707996938995001
+            translation 0.19999999999999996 -0.19999999999999996 -0.14999999999999997
+            rotation 1 -7.115210411036402e-10 7.115236072191825e-10 1.5707996938995001
             children [
               DEF Wheel Shape {
                 appearance MattePaint {
@@ -153,7 +157,7 @@ DEF DOG Robot {
                 }
                 geometry DEF Wheel_size Cylinder {
                   height 0.05
-                  radius 0.08
+                  radius 0.125
                 }
               }
             ]
@@ -162,6 +166,7 @@ DEF DOG Robot {
             boundingObject USE Wheel_size
             physics Physics {
             }
+            linearVelocity 0 0 -0.31392000000000003
           }
         }
         HingeJoint {
@@ -177,8 +182,8 @@ DEF DOG Robot {
             }
           ]
           endPoint Solid {
-            translation 0.19999999999999996 0.19999999999999996 -0.15
-            rotation 1 6.907823822076902e-10 -6.907850660799682e-10 1.5707996938995021
+            translation 0.19999999999999996 0.19999999999999996 -0.14999999999999997
+            rotation 1 6.907823822076902e-10 -6.907850660799681e-10 1.5707996938995021
             children [
               USE Wheel
             ]
@@ -187,6 +192,7 @@ DEF DOG Robot {
             boundingObject USE Wheel_size
             physics Physics {
             }
+            linearVelocity 0 0 -0.31392000000000003
           }
         }
         HingeJoint {
@@ -202,8 +208,8 @@ DEF DOG Robot {
             }
           ]
           endPoint Solid {
-            translation -0.19999999999999996 -0.19999999999999996 -0.15
-            rotation 1 6.907851887432363e-10 -6.907874508072056e-10 1.570799693899499
+            translation -0.19999999999999996 -0.19999999999999996 -0.14999999999999997
+            rotation 1 6.907851887432362e-10 -6.907874508072055e-10 1.570799693899499
             children [
               USE Wheel
             ]
@@ -212,6 +218,7 @@ DEF DOG Robot {
             boundingObject USE Wheel_size
             physics Physics {
             }
+            linearVelocity 0 0 -0.31392000000000003
           }
         }
         HingeJoint {
@@ -227,8 +234,8 @@ DEF DOG Robot {
             }
           ]
           endPoint Solid {
-            translation -0.19999999999999996 0.19999999999999996 -0.15
-            rotation 1 -7.115250646121181e-10 7.115272037061626e-10 1.5707996938995092
+            translation -0.19999999999999996 0.19999999999999996 -0.14999999999999997
+            rotation 1 -7.11525064612118e-10 7.115272037061626e-10 1.5707996938995092
             children [
               USE Wheel
             ]
@@ -237,6 +244,7 @@ DEF DOG Robot {
             boundingObject USE Wheel_size
             physics Physics {
             }
+            linearVelocity 0 0 -0.31392000000000003
           }
         }
         HingeJoint {
@@ -358,6 +366,7 @@ DEF DOG Robot {
   }
   controller "<extern>"
   supervisor TRUE
+  linearVelocity 0 0 -0.31392000000000003
 }
 Robot {
   translation 0.1 0 0.1

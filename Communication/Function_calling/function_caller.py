@@ -32,7 +32,7 @@ def function_caller(input_string: str, response_q: Queue):
 
     if response_call == 'global_nav':
         dest = response.candidates[0].content.parts[0].function_call.args['destination']
-        print(f'global_nav called! Destination: {dest}')
+        print(f'{response_call} called! Destination: {dest}')
 
         # Get current position and apply location refinement
         current_pos = get_gps_coords()
@@ -44,14 +44,29 @@ def function_caller(input_string: str, response_q: Queue):
               f"{top_place['location']}")
         tts_via_request(f"Okay! Starting Navigation to {top_place['displayName']['text']}")
 
-    elif response_call == 'get_next_waypoint_on_route':
-        print('get_next_waypoint_on_route called!')
+    elif response_call == 'change_speed':
+        # Changed to Boolean - Increase: True, Decrease: False - Assumes default value for magnitude
+        del_v = response.candidates[0].content.parts[0].function_call.args['del_v']
+        print(f'{response_call} called! Speed Change: {del_v}')
+        if del_v:
+            tts_via_request("Okay, speeding up")
+        elif not del_v:
+            tts_via_request("Okay, slowing down")
+        # Implement change speed call here (with optional param del_v)
 
     elif response_call == 'describe_env':
-        print('describe_env called!')
+        print(f'{response_call} called!')
         img = get_image('Communication/imgs')
         description = describe_image(img)
         tts_via_request(description)
+
+    elif response_call == 'system_stop':
+        print(f'{response_call} called!')
+        tts_via_request("Okay, system stopping")
+
+    elif response_call == 'system_go':
+        print(f'{response_call} called!')
+        tts_via_request("Great, let's go!")
 
     # FOR DEBUGGING ONLY - REMOVE LATER
     else:
@@ -71,27 +86,33 @@ def create_functions():
          'description': 'Begins global navigation from starting position to destination',
          'parameters': {'type_': 'OBJECT',
                         'properties': {
-                            'destination': {'type_': 'STRING'},
-                            'b': {'type_': 'NUMBER'}},
+                            'destination': {'type_': 'STRING'}},
                         'required': ['destination']}}]}
     func_list.append(global_nav)
 
     # Need to remove this one
-    get_next_waypoint_on_route = {'function_declarations': [
-        {'name': 'get_next_waypoint_on_route',
-         'description': 'Checks the current position using GPS and the current global navigator to identify where it '
-                        'is on the path and output the next path waypoint',
+    change_speed = {'function_declarations': [
+        {'name': 'change_speed',
+         'description': 'Increases or decreases the current velocity of the system. True for increase, False for decrease.',
          'parameters': {'type_': 'OBJECT',
                         'properties': {
-                            'position': {'type_': 'ARRAY'},
-                            'navigation_map': {'type_': 'OBJECT'}},
-                        'required': ['position', 'navigation_map']}}]}
-    func_list.append(get_next_waypoint_on_route)
+                            'del_v': {'type_': 'BOOLEAN'}}}}]}
+    func_list.append(change_speed)
 
     describe_env = {'function_declarations': [
         {'name': 'describe_env',
          'description': 'Used to describe the current environment around the user using system cameras'}]}
     func_list.append(describe_env)
+
+    system_stop = {'function_declarations': [
+        {'name': 'system_stop',
+         'description': 'Requests system to come to a full stop'}]}
+    func_list.append(system_stop)
+
+    system_go = {'function_declarations': [
+        {'name': 'system_go',
+         'description': 'Requests system start up.'}]}
+    func_list.append(system_go)
 
     return func_list
 

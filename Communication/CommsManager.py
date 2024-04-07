@@ -40,6 +40,13 @@ class CommsManager():
                 process.start()
             event = multiprocessing.Event()
 
+            # Test for process 3
+            # time.sleep(3)
+            # print("Type your text for speech synthesis here:")
+            # #     for i in range(3):
+            # desired_text = input()
+            # AudioRespond.audioRespond(self.response_q, desired_text)
+
             # End processes on exit (CTRL+C)
             while True:
                 if event.is_set():
@@ -49,15 +56,9 @@ class CommsManager():
                     sys.exit(1)
                 time.sleep(2)
 
-            # Test for process 3
-        #     time.sleep(3)
-        #     print("Type your text for speech synthesis here:")
-        # #     for i in range(3):
-        #     desired_text = input()
-        #     AudioRespond.audioRespond(self.response_q, desired_text)
         except KeyboardInterrupt:
             self.is_running = False
-            print("Processes Ended")
+            print("***Processes Ended***")
 
     def get_status(self):
         return self.is_running

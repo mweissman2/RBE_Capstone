@@ -18,7 +18,6 @@ def setup_wakeword_listener(keyword_path):
     client = OpenAI(api_key=OPEN_AI_KEY)
 
     # Setup wakeword listener
-    print("ASR Started! Listening...")
     porcupine = pvporcupine.create(
         access_key=PORCUPINE_API_KEY,
         keyword_paths=[keyword_path]
@@ -86,14 +85,18 @@ def run_audio(audio_q, transcription_q, keyword_path):
   Main function that coordinates wakeword detection, recording, and transcription.
   """
     # Setup
-    client, porcupine, pa, audio_stream = setup_wakeword_listener(keyword_path)
-    mic = sr.Microphone()
-    recorder = sr.Recognizer()
-    recorder.energy_threshold = 1000
-    recorder.dynamic_energy_threshold = False
-    with mic:
-        recorder.adjust_for_ambient_noise(mic)
+    try:
+        client, porcupine, pa, audio_stream = setup_wakeword_listener(keyword_path)
+        mic = sr.Microphone()
+        recorder = sr.Recognizer()
+        recorder.energy_threshold = 1000
+        recorder.dynamic_energy_threshold = False
+        with mic:
+            recorder.adjust_for_ambient_noise(mic)
+    except OSError:
+        print("ASR Process Cancelled Early")
 
+    print("ASR Started! Listening...")
     while True:
         try:
             # Listen for wakeword

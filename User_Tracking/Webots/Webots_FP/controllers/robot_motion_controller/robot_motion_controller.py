@@ -3,7 +3,7 @@
 # You may need to import some classes of the controller module. Ex:
 #  from controller import Robot, Motor, DistanceSensor
 from controller import Robot
-import motion_controller  as MC
+import Motion_Controller as MC
 from controller import Keyboard
 
 # create the Robot instance.
@@ -34,7 +34,7 @@ vx = 0
 vy = 0
 wz = 0
 #create the reference to motion controller
-my_controller = MC.MotionController(wheels[0],wheels[1],wheels[2],wheels[3], GPS, heading)
+my_controller = MC.Motion_Controller(wheels[0],wheels[1],wheels[2],wheels[3], GPS, heading)
 
 first = True
 # Main loop:

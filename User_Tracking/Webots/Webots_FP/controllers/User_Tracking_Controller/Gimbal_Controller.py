@@ -13,6 +13,7 @@ class Gimbal_Controller:
         self.depth_camera = depth_camera
         self.yaw_axis_motor = gimbal_joints[0]
         self.pitch_axis_motor = gimbal_joints[1]
+        self.motor_update_time = 32
 
         #extract camera parameters
         self.cam_horizontal_res = float(self.rgb_camera.getWidth())
@@ -230,8 +231,8 @@ class Gimbal_Controller:
         self.enable_recognition(status)
         self.enable_segmentation(status)
 
-        self.yaw_axis_motor.getPositionSensor().enable(32)
-        self.pitch_axis_motor.getPositionSensor().enable(32)
+        self.yaw_axis_motor.getPositionSensor().enable(self.motor_update_time)
+        self.pitch_axis_motor.getPositionSensor().enable(self.motor_update_time)
 
     def calc_pid(self,set_point, current_point, kpid, last_error, error_sum):
         error = set_point - current_point

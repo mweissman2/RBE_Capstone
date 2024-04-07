@@ -1,7 +1,11 @@
 import numpy as np
+import matplotlib
 import matplotlib.pyplot as plt
+
 import csv
 from multiprocessing import Pool
+
+matplotlib.use('TkAgg')
 
 #open file as reader
 csv_file = open('User_Tracking_Data.csv', 'r', newline='')

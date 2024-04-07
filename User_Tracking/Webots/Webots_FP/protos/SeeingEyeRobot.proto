@@ -20,6 +20,9 @@ PROTO SeeingEyeRobot [
     DEF ROBOT_BASE Solid {
       translation 0 0 -0.0016935350243008074
       children [
+        InertialUnit {
+          name "imu"
+        }
         Solid {
           translation 0.28 0 -0.00999987
           rotation 0 1 0 -1.5707953071795862
@@ -65,6 +68,8 @@ PROTO SeeingEyeRobot [
         Solid {
           translation 0 0 0.15
           children [
+            Speaker {
+            }
             Shape {
               appearance MattePaint {
                 baseColor 0 0.333333 0
@@ -85,13 +90,14 @@ PROTO SeeingEyeRobot [
           }
           device [
             RotationalMotor {
+              name "front_right_wheel"
             }
             PositionSensor {
             }
           ]
           endPoint Solid {
-            translation 0.2 -0.2 -0.15
-            rotation 1 -1.0370632309154904e-11 1.0370807250451913e-11 1.5707996938995423
+            translation 0.19999999999999996 -0.19999999999999996 -0.14999999999999997
+            rotation 1 -7.115210411036402e-10 7.115236072191825e-10 1.5707996938995001
             children [
               DEF Wheel Shape {
                 appearance MattePaint {
@@ -99,7 +105,7 @@ PROTO SeeingEyeRobot [
                 }
                 geometry DEF Wheel_size Cylinder {
                   height 0.05
-                  radius 0.08
+                  radius 0.125
                 }
               }
             ]
@@ -108,6 +114,7 @@ PROTO SeeingEyeRobot [
             boundingObject USE Wheel_size
             physics Physics {
             }
+            linearVelocity 0 0 -0.31392000000000003
           }
         }
         HingeJoint {
@@ -117,13 +124,14 @@ PROTO SeeingEyeRobot [
           }
           device [
             RotationalMotor {
+              name "front_left_wheel"
             }
             PositionSensor {
             }
           ]
           endPoint Solid {
-            translation 0.2 0.2 -0.15
-            rotation 1 -1.0372312618623644e-11 1.0372170329234128e-11 1.5707996938995434
+            translation 0.19999999999999996 0.19999999999999996 -0.14999999999999997
+            rotation 1 6.907823822076902e-10 -6.907850660799681e-10 1.5707996938995021
             children [
               USE Wheel
             ]
@@ -132,6 +140,7 @@ PROTO SeeingEyeRobot [
             boundingObject USE Wheel_size
             physics Physics {
             }
+            linearVelocity 0 0 -0.31392000000000003
           }
         }
         HingeJoint {
@@ -141,13 +150,14 @@ PROTO SeeingEyeRobot [
           }
           device [
             RotationalMotor {
+              name "back_right_wheel"
             }
             PositionSensor {
             }
           ]
           endPoint Solid {
-            translation -0.2 -0.2 -0.15
-            rotation 1 -1.0371633799625908e-11 1.0371747160129742e-11 1.5707996938995388
+            translation -0.19999999999999996 -0.19999999999999996 -0.14999999999999997
+            rotation 1 6.907851887432362e-10 -6.907874508072055e-10 1.570799693899499
             children [
               USE Wheel
             ]
@@ -156,6 +166,7 @@ PROTO SeeingEyeRobot [
             boundingObject USE Wheel_size
             physics Physics {
             }
+            linearVelocity 0 0 -0.31392000000000003
           }
         }
         HingeJoint {
@@ -165,13 +176,14 @@ PROTO SeeingEyeRobot [
           }
           device [
             RotationalMotor {
+              name "back_left_wheel"
             }
             PositionSensor {
             }
           ]
           endPoint Solid {
-            translation -0.2 0.2 -0.15
-            rotation 1 -1.0372160841997104e-11 1.037223112421577e-11 1.5707996938995399
+            translation -0.19999999999999996 0.19999999999999996 -0.14999999999999997
+            rotation 1 -7.11525064612118e-10 7.115272037061626e-10 1.5707996938995092
             children [
               USE Wheel
             ]
@@ -180,6 +192,7 @@ PROTO SeeingEyeRobot [
             boundingObject USE Wheel_size
             physics Physics {
             }
+            linearVelocity 0 0 -0.31392000000000003
           }
         }
         HingeJoint {
@@ -196,7 +209,7 @@ PROTO SeeingEyeRobot [
           ]
           endPoint Solid {
             translation -0.12 0 0.2
-            rotation 9.024993567198802e-17 1 0 4.692706653739929e-06
+            rotation 9.0249935671988e-17 0.9999999999999999 0 4.692706653739929e-06
             children [
               HingeJoint {
                 jointParameters HingeJointParameters {
@@ -226,17 +239,24 @@ PROTO SeeingEyeRobot [
                           recognitionColors [
                             0 0 0
                           ]
+                          fieldOfView 1.518
+                          width 640
+                          height 480
+                          noise 0.01
                           recognition Recognition {
+                            segmentation TRUE
                           }
                         }
                         RangeFinder {
                           translation -0.035 0 0
                           rotation 0 0 1 3.141592653589793
                           name "range_finder"
+                          fieldOfView 1.52
                           width 640
                           height 480
-                          minRange 0.02
-                          maxRange 4
+                          minRange 0.06
+                          maxRange 6
+                          noise 0.05
                         }
                         Shape {
                           appearance MattePaint {
@@ -292,6 +312,7 @@ PROTO SeeingEyeRobot [
       }
     }
   ]
+  supervisor TRUE
   controller IS controller
 }
 }

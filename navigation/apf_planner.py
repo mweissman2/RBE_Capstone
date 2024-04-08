@@ -5,7 +5,7 @@ from occupancy_map import *
 # notes: https://medium.com/nerd-for-tech/local-path-planning-using-virtual-potential-field-in-python-ec0998f490af
 
 class APF_Planner:
-    def __init__(self,start,goal,grid_size,obstacle_list) -> None:
+    def __init__(self,start,goal,grid_size) -> None:
         self.start = start
         self.goal = goal
         self.length = grid_size[0]
@@ -96,29 +96,38 @@ class APF_Planner:
             ax.add_patch(plt.Circle(obs, 0.5, color='r'))
             ax.annotate(f"Obstacle {obs}", xy = obs,fontsize=10, ha = "center")
         ax.set_title('vector field of Goal and Obstacles')
-        self.stream_path = plt.streamplot(self.X, self.Y, self.i_vector, self.j_vector, start_points = np.array(self.start).reshape(1,2),density = 2)
-        plt.show()
+        self.stream_path = plt.streamplot(self.X, self.Y, self.i_vector, self.j_vector, start_points = np.array(self.start).reshape(1,2),density = 1)
+
                 
 
     def extract_coordinates(self):
-        pass
-        
+        # exploring each node, build path based on arrow direction
+        # mini search
+        # angle bounds for each direction, correlate direction to which neighbor
+
+
         # Extract the coordinates of the streamlines
         streamlines = self.stream_path.lines.get_segments()  # you only need x and y of the 2nd index
-        return streamlines
+        return [pt[1] for pt in streamlines]
 
 
-start = (0,-12)
-goal = (0,0)
-grid_size = (30,30)
-# obstacle_list =[[1,5],[2,9],[8,6]]
-obstacle_list =[[12,5],[-2,-9]]
-test_obj = APF_Planner(start, goal, grid_size, obstacle_list)
-test_obj.repulsive_force(obstacle_list)
-test_obj.attractive_force()
-test_obj.plot_field(obstacle_list)
-
-print(test_obj.extract_coordinates())
-print('blah')
-
+# start = (0,5)
+# goal = (0,0)
+# grid_size = (30,30)
+# # obstacle_list =[[1,5],[2,9],[8,6]]
+# obstacle_list =[[12,5],[-2,-9]]
+# test_obj = APF_Planner(start, goal, grid_size, obstacle_list)
+#
+# test_obj.repulsive_force(obstacle_list)
+# test_obj.attractive_force()
+# test_obj.plot_field(obstacle_list)
+#
+# path = test_obj.extract_coordinates()
+# print([path])
+# for coord in path:
+#     if abs(coord[0]-start[0]) < .0001 and abs(coord[1]-start[1]) < .0001:
+#         print(f'Closest start point is: {coord}')
+#         new_start = coord
+#
+# plt.show()
 

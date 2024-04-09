@@ -22,7 +22,7 @@ user_id = user_node.getId()
 #logging data from file
 csv_file = open(cwd + '\\User_Tracking_Data.csv', 'w', newline='')
 csv_writer = csv.writer(csv_file)
-header = ['Actual X Pos', 'Actual Y Pos', 'Measured X Pos', 'Measured Y Pos', 'Timestep' 'Out_of_range']
+header = ['Actual X Pos', 'Actual Y Pos', 'Measured X Pos', 'Measured Y Pos', 'Timestep', 'Out_of_range']
 csv_writer.writerow(header)
 
 #enable keboard for exiting program and controlling
@@ -81,19 +81,22 @@ vy = 0
 wz = 0
 while robot.step(timestep) != -1:
     #set motor control
-    key = keyboard.getKey()
+    key = 0
+    while key != -1:
+        key = keyboard.getKey()
+
     if key == ord('I'):
-        vx += 0.5
+        vx += 0.1
     if key == ord('L'):
-        vx -= 0.5
+        vx -= 0.1
     if key == ord('K'):
-        vy += 0.5
+        vy += 0.1
     if key == ord(':'):
-        vy -= 0.5
+        vy -= 0.1
     if key == ord('I'):
-        wz += 0.5
+        wz += 0.1
     if key == ord('P'):
-        wz -= 0.5
+        wz -= 0.1
 
     vels = [vx, vy, wz]
     print(vels)
@@ -121,7 +124,7 @@ while robot.step(timestep) != -1:
         i = 0
     i += 1
     key = keyboard.getKey()
-    if key==80: #letter p
+    if key==ord('{'): #letter {
         break
 
     pass

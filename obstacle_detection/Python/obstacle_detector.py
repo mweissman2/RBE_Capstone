@@ -11,6 +11,7 @@ class ObstacleDetector:
         #metric for noise in the model
         self.noise = 0
         self.accuracy = 0
+        self.chance_of_no_detection = 0
 
 
         #dictionary for storing different camera objects seen
@@ -25,7 +26,7 @@ class ObstacleDetector:
         #set camera settings
         self.cam.recognitionEnable(sample_period)
 
-    #returns a list of objects with their ID, world location, description, relative location to the robot
+    #returns a list of objects with their ID, world location, estimated_radius, estimated_velocity, description, relative location to the robot
     def get_camera_obstacles(self):
         #should pull from an internally set list that is updated occasionally, instead of pulling only when its updated?
         return 0
@@ -55,6 +56,9 @@ class ObstacleDetector:
 
     def prune_obstacles(self, distance, robot_position):
         #iterate through the list of obstacles, and remove if far away from the robot.
+        return 0
+
+    def calculate_obstacle_velocity(self):
         return 0
 
 

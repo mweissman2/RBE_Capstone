@@ -20,7 +20,7 @@ class MotionController:
         self.current_position = [0,0,0]
         self.current_velocity = [0,0,0]
         self.goal_position = [0,0,0]
-        self.error_epsilon = 0.3
+        self.error_epsilon = 0.05
         self.heading_epsilon = 0.2
         self.current_heading = 0
         self.wheel_radius = 0.125
@@ -222,6 +222,9 @@ class MotionController:
         self.ax1.plot(self.y_array)
         self.ax2.plot(self.x_array)
         self.ax2.plot(self.x_goal)
+        self.ax2.set_ylabel('X_position')
+        self.ax1.set_ylabel('Y_position')
+        self.ax1.set_title('Robot Position vs Setpoint')
         #self.ax1.set_xlim([-5, 5])
         #self.ax1.set_ylim([-5, 5])
         plt.show(block=False)

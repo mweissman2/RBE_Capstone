@@ -19,6 +19,35 @@ def get_image(folder_path):
         return None  # No JPEGs found
 
 
+def describe_image_short(img: Image):
+    print("Image captioning starting")
+    img.show()
+
+    # Perform response refinement here
+    API_KEY = utils.get_key("GEMINI_API_KEY")
+    genai.configure(api_key=API_KEY)
+
+    # Model configuration
+    generation_config = genai.types.GenerationConfig(
+        temperature=0.5,
+        top_p=1,
+        top_k=1,
+        max_output_tokens=512,
+    )
+
+    safety_settings = utils.set_gemini_safety_settings()
+
+    model = genai.GenerativeModel(model_name="gemini-pro-vision",
+                                  generation_config=generation_config,
+                                  safety_settings=safety_settings)
+
+    prompt = "Only describe the most important objects in the image and the overall scene. Keep your response concise."
+
+    response = model.generate_content([prompt, img])
+    print(f"Image Caption: {response.text}")
+
+    return response.text
+
 def describe_image(img: Image):
     print("Image captioning starting")
     img.show()
@@ -35,24 +64,7 @@ def describe_image(img: Image):
         max_output_tokens=2048,
     )
 
-    safety_settings = [
-        {
-            "category": "HARM_CATEGORY_HARASSMENT",
-            "threshold": "block_none"
-        },
-        {
-            "category": "HARM_CATEGORY_HATE_SPEECH",
-            "threshold": "block_none"
-        },
-        {
-            "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-            "threshold": "block_none"
-        },
-        {
-            "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
-            "threshold": "block_none"
-        },
-    ]
+    safety_settings = utils.set_gemini_safety_settings()
 
     model = genai.GenerativeModel(model_name="gemini-pro-vision",
                                   # generation_config=generation_config,

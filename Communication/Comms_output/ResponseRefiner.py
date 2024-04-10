@@ -1,3 +1,4 @@
+import time
 from multiprocessing import Queue
 import google.generativeai as genai
 from Communication import utils
@@ -14,15 +15,25 @@ def response_subscriber(response_q):
         try:
             # Pull audio from queue
             latest_response = response_q.get(block=True)
+            start = time.perf_counter()
 
             # Get image caption:
-            img = get_image('Communication/imgs')
-            context = describe_image(img)
+            # img = get_image('Communication/imgs')
+            # context = describe_image(img)
             # context = few_shot_describe_image(img)
 
+            # Instead of getting image, get obstacle dict: - Need to implement
+            # context = get_obstacles()
+
             # Refine response and call text to speech
-            refined_response = response_refiner(latest_response, context)
+            refined_response = response_refiner(latest_response)
+            # refined_response = response_refiner(latest_response, context)
             tts_via_request(refined_response)
+
+            # Print execution time
+            end = time.perf_counter()
+            elapsed_time = end - start
+            print(f"Function_caller execution time: {elapsed_time} seconds")
         except KeyboardInterrupt:
             break
 
@@ -47,6 +58,8 @@ def response_refiner(response_raw: str, context: str = "There is a cyclist up ah
     model = genai.GenerativeModel(model_name="gemini-pro",
                                   # generation_config=generation_config,
                                   safety_settings=safety_settings)
+
+    # NOTE: NEED TO FIX FEW-SHOT PROMPT PARTS - REPLACE CONTEXT WITH OBSTACLE LIST
 
     prompt_parts = [
         "You are an assistive device for people with visual impairments. Your job is to take a simple command and "

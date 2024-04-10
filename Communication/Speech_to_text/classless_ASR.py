@@ -1,3 +1,5 @@
+import time
+
 import pvporcupine
 import pyaudio
 from Communication import utils
@@ -69,14 +71,14 @@ def transcribe_audio(client, audio_q):
     buffer.name = 'file.wav'
 
     # Read the transcription.
-    print("Processing...")
+    # print("Processing...")
     result = client.audio.transcriptions.create(
         model="whisper-1",
         language="en",
         file=buffer,
         response_format="text",
     )
-    print("Processed!")
+    # print("Processed!")
     return result
 
 
@@ -86,6 +88,8 @@ def run_audio(audio_q, transcription_q, keyword_path):
   """
     # Setup
     try:
+        start = time.perf_counter()
+
         client, porcupine, pa, audio_stream = setup_wakeword_listener(keyword_path)
         mic = sr.Microphone()
         recorder = sr.Recognizer()
@@ -93,6 +97,10 @@ def run_audio(audio_q, transcription_q, keyword_path):
         recorder.dynamic_energy_threshold = False
         with mic:
             recorder.adjust_for_ambient_noise(mic)
+
+        end = time.perf_counter()
+        elapsed_time = end - start
+        print(f"%%%ASR_setup execution time: {elapsed_time} seconds")
     except OSError:
         print("ASR Process Cancelled Early")
 
@@ -103,13 +111,18 @@ def run_audio(audio_q, transcription_q, keyword_path):
             if listen_for_wakeword(porcupine, audio_stream):
                 # Record audio
                 record_audio(mic, recorder, audio_q)
+                start = time.perf_counter()
 
                 # Transcribe audio
                 transcription = transcribe_audio(client, audio_q)
 
                 # Push transcription to queue
                 transcription_q.put(transcription)
-                print(f"Transcription: {transcription}")
+                # print(f"Transcription: {transcription}")
+
+                end = time.perf_counter()
+                elapsed_time = end - start
+                print(f"%%%Transcription execution time: {elapsed_time} seconds")
         except KeyboardInterrupt:
             break
 

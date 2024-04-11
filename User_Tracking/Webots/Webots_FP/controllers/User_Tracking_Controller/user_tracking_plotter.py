@@ -19,7 +19,7 @@ time_actual = []
 x_pos_measured = []
 y_pos_measured = []
 
-header = ['Actual X Pos', 'Actual Y Pos', 'Measured X Pos', 'Measured Y Pos', 'Timestep' 'Out_of_range']
+#header = ['Actual X Pos', 'Actual Y Pos', 'Measured X Pos', 'Measured Y Pos', 'Timestep' 'Out_of_range']
 
 names = csv_reader.fieldnames
 print(names)

@@ -62,8 +62,18 @@ while robot.step(timestep*3) != -1:
     #print(vels)
     #my_controller.set_velocity(vx,vy,wz)
 
+
+    #if first:
+    #    my_controller.set_current_position()
+    #    my_controller.new_plan_trajectory([4,4,0.5],5)
+    #    first = False
+
+    #done_flag = my_controller.move()
+    #if done_flag == False:
+    #    print("Robot")
+
     if first:
-        #next_point = input("What is the desired point")
+        next_point = input("What is the desired point")
         my_controller.plan_trajectory([2,4,0.36], [0.25,0.25,0], 10)
         first = False
 

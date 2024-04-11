@@ -255,16 +255,15 @@ class Gimbal_Controller:
             out_of_range_flag = True
         return self.prev_position, out_of_range_flag
 
-
     def calculate_user_position_new(self, depth, angle, user_position_on_image):
         #calculates the distance from left to right given the current depth measurement
         horizontal_distance = np.tan(self.horizontal_fov/2)*depth
         horizontal_displacement = horizontal_distance*-user_position_on_image[1]
-
+        #horizontal_displacement = 0
         position_in_camera_frame = np.array([depth, horizontal_displacement, 0, 1]).reshape(4,1)
 
         tf_matrix = np.array([[np.cos(angle), -np.sin(angle), 0, -0.12], [np.sin(angle), np.cos(angle), 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]])
 
         new_position = np.matmul(tf_matrix, position_in_camera_frame)
 
-        return new_position[0][0], new_position[1][0]
+        return new_position[1][0], -new_position[0][0]

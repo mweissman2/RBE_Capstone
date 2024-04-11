@@ -94,4 +94,4 @@ while robot.step(timestep) != -1:
 csv_file.close()
 
 #read csv file and plot with matplotlib
-exec(open(cwd+ '\\user_tracking_plotter.py').read())
+#exec(open(cwd+ '\\user_tracking_plotter.py').read())

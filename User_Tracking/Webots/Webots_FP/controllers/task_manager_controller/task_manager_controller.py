@@ -1,5 +1,6 @@
 #init code here is not proper
 from robot_motion_controller import motion_controller
+from velocity_obstacle import *
 
 comms = communcation_controller()
 user_tracker = Gimbal_Controller()
@@ -13,6 +14,15 @@ velocity_min = 0
 velocity_delta = 0.3
 
 counter = 0
+
+# instantiate necessary objects
+vo_algo = velocityObstacle()
+local_start = [10, -20]
+local_goal = [0, 10]
+grid_size = [50, 50]
+
+local_planner = APF_Planner(local_start, local_goal, grid_size)
+
 
 while robot.step(timestep) != -1:
 
@@ -43,7 +53,17 @@ while robot.step(timestep) != -1:
         #finds obstacles
         obstacles = front_sensors.get_camera_obstacles()
         #local planner takes in obstacles and caculates the next point to send to the motion planner
-        next_waypoint, next_velocity = local_planner.run(obstacles, velocity_target, user_position)
+        vo_algo.update_obstacles(obstacles)
+        for i in range(len(obstacles)):
+            current_cone_vertices = vo_algo.vo_calculation(o_map.occupancy_grid, robot_pos, o_velocity[i],
+                                                           robot_velocity)
+            cone_vertices_list.append(current_cone_vertices)
+            vo_path_list.append(mplpath.Path(current_cone_vertices))  # use this to visualize the cone construction
+        local_planner.repulsive_force(obstacle_coord)  # pass in obstacle coordinates to APF
+        local_planner.attractive_force()  # currently has issue with distance calculation
+        # local_planner.plot_field(obstacle_coord)
+        local_planner.extract_points        # must add extractor method to this
+
         #when it recieves a new point it makes a new trajectory
         motion_controller.calc_trajectory(next_waypoint,next_velocity)
 

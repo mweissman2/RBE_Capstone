@@ -7,7 +7,7 @@ matplotlib.use('TkAgg')
 
 data_len = 200
 
-class MotionController:
+class Motion_Controller:
     def __init__(self, wheel1, wheel2, wheel3, wheel4, localization, heading):
         self.inside_wheel_front = wheel1 #front left
         self.inside_wheel_back = wheel4 #back right

@@ -31,6 +31,7 @@ class Gimbal_Controller:
         self.last_direction = 1 #positive 1 for positive rotation, -1 for negative rotation
         self.user_in_frame = False
         self.center_error_margin = 0.06 #50 pixels?
+        self.max_distance = 3 #max distance the user is allowed to be from the robot
 
         self.x_velocity_buffer = [0,0,0,0,0]
         self.y_velocity_buffer = [0,0,0,0,0]
@@ -244,6 +245,10 @@ class Gimbal_Controller:
         return output, error, error_sum
 
     def run(self):
+        out_of_range_flag = False
         self.find_user()
-        return self.prev_position
+        distance = np.sqrt(self.prev_position[0]**2 + self.prev_position[1]**2)
+        if distance > self.max_distance:
+            out_of_range_flag = True
+        return self.prev_position, out_of_range_flag
 

@@ -2,7 +2,7 @@
 from robot_motion_controller import motion_controller
 from velocity_obstacle import *
 
-comms = communcation_controller()
+comms = communication_controller()
 user_tracker = Gimbal_Controller()
 motion = Motion_Controller()
 front_sensors = Object_Detector()

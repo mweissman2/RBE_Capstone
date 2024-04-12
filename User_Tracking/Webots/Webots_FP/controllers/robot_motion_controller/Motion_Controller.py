@@ -20,12 +20,14 @@ class Motion_Controller:
         self.current_position = [0,0,0]
         self.current_velocity = [0,0,0]
         self.goal_position = [0,0,0]
-        self.error_epsilon = 0.05
+        self.error_epsilon = 0.1
         self.heading_epsilon = 0.2
         self.current_heading = 0
         self.wheel_radius = 0.125
         self.l_x = 0.2
         self.l_y = 0.2
+        self.curr_time = 0
+        self.goal_time = 0
 
         self.x_array = []
         self.y_array = []
@@ -238,7 +240,10 @@ class Motion_Controller:
         return current_velocity
 
     #calculates needed velocities to go to next point given
-    def new_plan_trajectory(self, goal_position, time):
+    def new_plan_trajectory(self, goal_position, time, curr_time):
+        self.curr_time = curr_time
+        self.goal_time = curr_time+time
+
         heading_delta = goal_position[2] - self.current_position[2]
         x_delta = goal_position[0] - self.current_position[0]
         y_delta = goal_position[1] - self.current_position[1]
@@ -249,35 +254,46 @@ class Motion_Controller:
         else:
             angular_velocity = heading_delta / time
 
-            m11 = (np.sin(angular_velocity)*time)/angular_velocity
-            m12 = (np.cos(angular_velocity)*time)/angular_velocity
-            m21 = (np.sin(angular_velocity)*time)/angular_velocity
-            m22 = -(np.cos(angular_velocity)*time)/angular_velocity
+            m11 = (np.sin(angular_velocity*time))/angular_velocity
+            m12 = (np.cos(angular_velocity*time))/angular_velocity - (1/angular_velocity)
+            m21= -(np.cos(angular_velocity * time)) / angular_velocity + (1/angular_velocity)
+            m22 = (np.sin(angular_velocity*time))/angular_velocity
 
-            xm = x_delta+(1/angular_velocity)
-            ym = y_delta-(1/angular_velocity)
+
+            xm = x_delta
+            ym = y_delta
 
             velocities = np.matmul(np.linalg.inv(np.array([[m11, m12],[m21, m22]])), np.array([xm, ym]).reshape(2,1))
-
+            print(velocities)
         self.goal_position = goal_position
 
         self.x_vel_traj = velocities[0][0]
         self.y_vel_traj = velocities[1][0]
         self.z_vel_traj = angular_velocity
 
-    def move(self):
-        self.set_velocity(self.x_vel_traj, self.y_vel_traj, self.z_vel_traj)
-
+    def move(self, curr_time):
         self.set_current_position()
+        self.curr_time = curr_time
         print(self.current_position)
-        if self.finished_flag == False:
 
+        if self.curr_time > self.goal_time+0.5:
+            print("missed the target")
+            if abs(self.current_position[0] - self.goal_position[0]) <= self.error_epsilon*5:
+                if abs(self.current_position[1] - self.goal_position[1]) <= self.error_epsilon*5:
+                    print("Close to Goal")
+                    self.at_goal_position()
+                    return False
+
+
+        if self.finished_flag == False:
             if abs(self.current_position[0] - self.goal_position[0]) <= self.error_epsilon:
                 if abs(self.current_position[1] - self.goal_position[1]) <= self.error_epsilon:
                     if abs(self.current_position[2] - self.goal_position[2]) <= self.heading_epsilon:  # heading error is less important
                         print("At Goal")
                         self.at_goal_position()
                         return False
+            else:
+                self.set_velocity(self.x_vel_traj, self.y_vel_traj, self.z_vel_traj)
 
             return True
 

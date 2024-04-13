@@ -81,21 +81,20 @@ vy = 0
 wz = 0
 while robot.step(timestep) != -1:
     #set motor control
-    key = 0
-    while key != -1:
-        key = keyboard.getKey()
+
+    key = keyboard.getKey()
 
     if key == ord('I'):
         vx += 0.1
-    if key == ord('L'):
-        vx -= 0.1
     if key == ord('K'):
+        vx -= 0.1
+    if key == ord('L'):
         vy += 0.1
-    if key == ord(':'):
+    if key == ord('J'):
         vy -= 0.1
-    if key == ord('I'):
+    if key == ord('U'):
         wz += 0.1
-    if key == ord('P'):
+    if key == ord('O'):
         wz -= 0.1
 
     vels = [vx, vy, wz]

@@ -9,6 +9,7 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/project
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/buildings/protos/SimpleBuilding.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/geometries/protos/Extrusion.proto"
 EXTERNPROTO "../protos/SeeingEyeRobot.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/humans/pedestrian/protos/Pedestrian.proto"
 
 WorldInfo {
   info [
@@ -20,8 +21,8 @@ WorldInfo {
   lineScale 5
 }
 Viewpoint {
-  orientation 0.05442724841792363 0.9958438528420787 -0.07302530647863072 1.2849094571046487
-  position -506.9620774111217 -65.23541518398449 1425.5710764044113
+  orientation 0.2372190597239922 0.0882595693179896 -0.9674385593553049 2.450560635267936
+  position 378.3370210389113 67.63110103231574 7.589775886253213
   near 3
 }
 TexturedBackground {
@@ -17847,7 +17848,7 @@ SimpleBuilding {
   wallType "glass building"
 }
 SimpleBuilding {
-  translation -61.7 30.28 0
+  translation -53.33 30.28 0
   name "The Windsor Building"
   floorNumber 5
   corners [
@@ -20512,25 +20513,19 @@ DEF parking Pose {
     }
   ]
 }
-SeeingEyeRobot {
-  hidden translation_1 0 0 -0.002007647896919096
-  hidden rotation_1 -0.3558427704147549 -0.9345458376899188 0 2.0534804557229185e-17
-  hidden position_1_0 5.318167794822558e-17
-  hidden position_1_1 5.3922714416748683e-17
-  hidden position_1_2 5.90080063603685e-17
-  hidden position_1_3 5.443844560264998e-17
-  hidden linearVelocity_1 -2.3323745102843694e-21 4.934936054750167e-21 -7.090794556631869e-06
-  hidden angularVelocity_1 9.11861067948788e-16 4.3074242375912444e-16 1.2802182119481823e-26
-  hidden linearVelocity_8 1.6772178318115542e-17 8.252150115492376e-18 -8.510397479974134e-06
-  hidden angularVelocity_8 5.604450576194215e-16 6.61850223782501e-17 1.3877787809299038e-15
-  hidden linearVelocity_9 1.8285760398625927e-16 -8.016293055515333e-17 -8.510397479917537e-06
-  hidden angularVelocity_9 3.3804594414950695e-16 -4.143621100590336e-16 1.3877787808370458e-15
-  hidden linearVelocity_10 1.7809533149630175e-16 -9.078266819022225e-17 -8.510397479917434e-06
-  hidden angularVelocity_10 -4.396359634666971e-16 -1.875562635610127e-15 8.171863542526375e-26
-  hidden linearVelocity_11 6.033687215432452e-17 2.8116194154371095e-17 -8.510397479917491e-06
-  hidden angularVelocity_11 -6.417763521236552e-17 -9.525629803972468e-16 1.0408340855255325e-15
-  translation -14.21 -72.51 0.39
-  rotation 0 0 1 1.0472
-  name "seeing_eye_robot"
-  controller "seeing_eye_dog"
+DEF DOG SeeingEyeRobot {
+  translation 369.26 58.37 0.25
+  rotation 0 0 1 3.14159
+  controller "<extern>"
+}
+Robot {
+  name "supervisor"
+  controller "supervisor_controller_auto"
+  supervisor TRUE
+}
+DEF USER Pedestrian {
+  translation 371.23 58 1.27
+  rotation 0 0 1 3.14159
+  name "user"
+  controller "<none>"
 }

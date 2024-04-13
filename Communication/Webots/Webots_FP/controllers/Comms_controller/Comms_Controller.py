@@ -6,17 +6,16 @@ from controller import Robot
 from controller import Supervisor
 from controller import Keyboard, Speaker
 from Communication.CommsManager import *
+from multiprocessing import Process, Queue
 import os
 
 
 
 # Main loop:
 # - perform simulation steps until Webots is stopping the controller
+
 def main():
     robot = Supervisor()
-    # get ID of user for tracking.
-    user_node = robot.getFromDef('USER')
-    user_id = user_node.getId()
     # create the Robot instance.
     # my_robot = robot.getFromDef('DOG')
 
@@ -30,15 +29,14 @@ def main():
 
     # get GPS for position tracking
     GPS = robot.getDevice('gps')
-    GPS.enable(camera_timestep)
+    GPS.enable(timestep)
 
     # get speaker for output comms
-    speaker = robot.getDevice('speaker')
-
+    # speaker = robot.getDevice('speaker')
 
     # Create and run comms manager
-    # manager = CommsManager('webots')
-    manager = CommsManager()
+    queue_dict = {'audio': Queue(), 'transcription': Queue(), 'response': Queue(), 'position': Queue(), 'flag': Queue()}
+    manager = CommsManager(queue_dict, simMode=True)
     manager.run_processes()
 
     # Quick test for multiprocessing
@@ -53,11 +51,16 @@ def main():
     j = 0
     while robot.step(timestep) != -1:
         if i == 50:
-            print(GPS.getValues()[0])
-            # Speaker.playSound(speaker, speaker, audio_file, 1.0, 1.0, 0, False)
+            # print(GPS.getValues()[0], GPS.getValues()[1])
             # print(manager.get_status())
             i = 0
 
+        # Checks if position is requested
+        flag = queue_dict['flag'].get()
+        if flag == 'getPos_request':
+            current_pos = GPS.getValues()[0], GPS.getValues()[1]
+            queue_dict['position'].put(current_pos)
+            print(flag)
         i += 1
         key = keyboard.getKey()
         if key==80: #letter p

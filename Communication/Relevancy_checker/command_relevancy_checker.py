@@ -2,8 +2,14 @@ import time
 from multiprocessing import Queue
 from Communication.Function_calling.function_caller import function_caller
 
-def relevancy_subscriber(transcription_q: Queue, response_q: Queue):
+
+def relevancy_subscriber(queue_dict: dict[str, Queue], simMode: bool):
     print("relevancy_subscriber started!")
+
+    flag_q = queue_dict['flag']
+    transcription_q = queue_dict['transcription']
+    response_q = queue_dict['response']
+
     while True:
         try:
             # Pull audio from queue
@@ -19,7 +25,7 @@ def relevancy_subscriber(transcription_q: Queue, response_q: Queue):
 
             # If relevant, pass to function caller. Else, clarify input
             if relevancy:
-                function_caller(transcription)
+                function_caller(transcription, queue_dict, simMode)
                 relevancy = False
             else:
                 # Send for clarification
@@ -40,4 +46,3 @@ def relevancy_check(input_string: str):
     # else, return False and send to LLM for clarifying question
 
     return True
-

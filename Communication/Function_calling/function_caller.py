@@ -4,11 +4,11 @@ import google.generativeai as genai
 import google.ai.generativelanguage as glm
 from Communication import utils
 from Communication.Comms_output.ImageCaptioner import get_image, describe_image_short, few_shot_describe_image
-from Communication.Location_helpers.location_refiner import destination_search, get_gps_coords
+from Communication.Location_helpers.location_refiner import destination_search
 from Communication.Comms_output.Text_to_speech import tts_via_request
 
 
-def function_caller(input_string: str):
+def function_caller(input_string: str, queue_dict: dict[str, Queue], simMode):
     start = time.perf_counter()
     API_KEY = utils.get_key("GEMINI_API_KEY")
     genai.configure(api_key=API_KEY)
@@ -33,7 +33,7 @@ def function_caller(input_string: str):
     response_call = response.candidates[0].content.parts[0].function_call.name
 
     if response_call == 'global_nav':
-        global_nav(start, response, response_call)
+        global_nav(start, response, response_call, queue_dict, simMode)
 
     elif response_call == 'change_speed':
         change_speed(start, response, response_call)
@@ -103,12 +103,19 @@ def create_functions():
     return func_list
 
 
-def global_nav(start, response, response_call):
+def global_nav(start, response, response_call, queue_dict, simMode):
     dest = response.candidates[0].content.parts[0].function_call.args['destination']
     print(f'{response_call} called! Destination: {dest}')
 
     # Get current position and apply location refinement
-    current_pos = get_gps_coords()
+    if simMode:
+        queue_dict['flag'].put("getPos_request")
+        current_pos = queue_dict['position'].get(block=True)
+        print(f'Picked up in function caller: {current_pos}')
+    else:
+        current_pos = 42.27377897661122, -71.80928749664702
+
+    # current_pos = get_gps_coords()
     top_place = destination_search(dest, current_pos)
 
     # *** Instead of printing, pass to global nav ***

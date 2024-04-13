@@ -86,6 +86,7 @@ class velocityObstacle():
 
     def vo_calculation(self,local_occupy_map,robot_pos,velocity_of_obstacle,robot_velocity):
         # calculate the velocity obstacle from obstacles
+
         cone_coordinates = []
         self.robot_pose = robot_pos
         for obstacle in self.obstacles:
@@ -100,18 +101,6 @@ class velocityObstacle():
 
         # create
 
-    def update_obstacles(self,new_obstacles):
+    def update_obstacles(self,new_obstacles,inflate_radius):
         self.obstacles = new_obstacles  # dict of webots world obstacles, key = obstacle id, value = velocity vector
-
-    def obstacle_inflation(self):
-        # here the obstacle needs to be inflated according to the dimensions of the robot
-        # creating an inflated circle around obstacle is the easiest
-        pass
-
-    def detect(self):
-        # detect whether the robot will enter the velocity obstacle space
-        pass
-
-    def trajectory_plan(self):
-        # given the obstacles created from VO, plan a path around
-        pass
+        self.inflation_radius = inflate_radius

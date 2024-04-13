@@ -1,3 +1,4 @@
+import math
 
 from matplotlib import pyplot as plt
 import numpy as np
@@ -96,21 +97,68 @@ class APF_Planner:
             ax.add_patch(plt.Circle(obs, 0.5, color='r'))
             ax.annotate(f"Obstacle {obs}", xy = obs,fontsize=10, ha = "center")
         ax.set_title('vector field of Goal and Obstacles')
-        self.stream_path = plt.streamplot(self.X, self.Y, self.i_vector, self.j_vector, start_points = np.array(self.start).reshape(1,2),density = 1)
+        # self.stream_path = plt.streamplot(self.X, self.Y, self.i_vector, self.j_vector, start_points = np.array(self.start).reshape(1,2),density = 1)
+
+
+    def get_next_point(self,current_pose):
+
+        column_x = np.where(self.X == current_pose[0])[1][0]
+        corresponding_y_values = self.Y[:, column_x]
+        row_y = np.where(corresponding_y_values == current_pose[1])[0][0]
+
+        local_i_vec = self.i_vector[row_y][column_x]
+        local_j_vec = self.j_vector[row_y][column_x]
+        # calculate angle from the unit vector
+        angle_to_approach = math.atan2(local_j_vec,local_i_vec)
+        degree_threshold_22 = math.pi/8             # named after pi/8 which is about 22.5 degrees
+        # iterate through all direction permutations, mutually exclusive
+        if math.pi/2 + degree_threshold_22 > angle_to_approach > math.pi/2 - degree_threshold_22:   # north
+            next_point = [current_pose[0],current_pose[1]+1]
+        elif math.pi/2 - degree_threshold_22 >= angle_to_approach >= degree_threshold_22:           # northeast
+            next_point = [current_pose[0]+1, current_pose[1] + 1]
+        elif degree_threshold_22 > angle_to_approach > -degree_threshold_22:                        # east
+            next_point = [current_pose[0]+1, current_pose[1]]
+        elif -degree_threshold_22 >= angle_to_approach >= -math.pi/2+degree_threshold_22:                    # southeast
+            next_point = [current_pose[0] + 1, current_pose[1]-1]
+        elif -math.pi/2+degree_threshold_22 > angle_to_approach > -math.pi/2 - degree_threshold_22:     # south
+            next_point = [current_pose[0], current_pose[1]-1]
+        elif -math.pi/2-degree_threshold_22 >= angle_to_approach >= -math.pi + degree_threshold_22:     # southwest
+            next_point = [current_pose[0]-1, current_pose[1]-1]
+        elif -math.pi + degree_threshold_22 > angle_to_approach >= -math.pi or math.pi - degree_threshold_22 < angle_to_approach <= math.pi:     # west
+            next_point = [current_pose[0]-1, current_pose[1]]
+        elif math.pi - degree_threshold_22 >= angle_to_approach >= math.pi/2 + degree_threshold_22:    # northwest
+            next_point = [current_pose[0] - 1, current_pose[1] + 1]
 
                 
+        return next_point
 
-    def extract_coordinates(self):
+    def get_distance(self,first_point,second_point):
+        distance = math.sqrt((first_point[0]-second_point[0])**2+(first_point[1]-second_point[1])**2)
+        return distance
+
+    def path_finder(self,distance_tolerance):
         # exploring each node, build path based on arrow direction
         # mini search
-        # angle bounds for each direction, correlate direction to which neighbor
+
+        path = []
+        next_node = self.get_next_point(self.start)
+        path.append(next_node)
+        for i in range(1000):
+            next_node = self.get_next_point(next_node)
+            path.append(next_node)
+
+            if self.get_distance(next_node,self.goal) <= distance_tolerance:  #maybe just make this
+                return path
+
 
 
         # Extract the coordinates of the streamlines
-        streamlines = self.stream_path.lines.get_segments()  # you only need x and y of the 2nd index
-        return [pt[1] for pt in streamlines]
+        # streamlines = self.stream_path.lines.get_segments()  # you only need x and y of the 2nd index
+        # return [pt[1] for pt in streamlines]
 
 
+
+# test case
 # start = (0,5)
 # goal = (0,0)
 # grid_size = (30,30)

@@ -34,9 +34,10 @@ if __name__ == "__main__":
 
     o_map = OccupancyMap(100,100)
     # o_map.test_grid()    # create test grid
-    
+
+    inflate_radius = 3
     # add computational time data
-    vo_algo.update_obstacles(obstacles)
+    vo_algo.update_obstacles(obstacles,inflate_radius)         # also add argument for the radius of the obstacles
     for i in range(len(obstacles)):
         current_cone_vertices = vo_algo.vo_calculation(o_map.occupancy_grid, robot_pos, o_velocity[i], robot_velocity)
         cone_vertices_list.append(current_cone_vertices)
@@ -44,8 +45,8 @@ if __name__ == "__main__":
 
 
     # Extract x and y coordinates from cone_vertices
-    x_coords = [vertex[0] for vertex in cone_vertices_list]
-    y_coords = [vertex[1] for vertex in cone_vertices_list]
+    # x_coords = [vertex[0] for vertex in cone_vertices_list]
+    # y_coords = [vertex[1] for vertex in cone_vertices_list]
 
 
     o_map.discretize_grid(vo_path_list)           # extract mesh of velocity obstacles
@@ -53,14 +54,23 @@ if __name__ == "__main__":
     # APF section
 
     local_start = [10, -20]
-    local_goal = [0, 10]
+    local_goal = [10, 15]
     grid_size = [50, 50]
-
+    distance_tolerance = 1.9
     local_planner = APF_Planner(local_start, local_goal, grid_size)
 
     local_planner.repulsive_force(obstacle_coord)       # pass in obstacle coordinates to APF
     local_planner.attractive_force()            # currently has issue with distance calculation
     local_planner.plot_field(obstacle_coord)
+    local_path = local_planner.path_finder(distance_tolerance)                 # find the path and
+    x_path = [coord[0] for coord in local_path]
+    y_path = [coord[1] for coord in local_path]
+    plt.plot(x_path, y_path, linestyle='-', color='b', label='Coordinates')
+    print(local_path)
+
+
+
+
     # Plot the points
     # plt.figure()
     # plt.plot(x_coords, y_coords, 'ro')  # 'ro' specifies red circles for points

@@ -109,21 +109,26 @@ def global_nav(start, response, response_call, queue_dict, simMode):
 
     # Get current position and apply location refinement
     if simMode:
-        queue_dict['flag'].put("getPos_request")
+        queue_dict['flag'].put({"getPos_request": ''})
         current_pos = queue_dict['position'].get(block=True)
-        print(f'Picked up in function caller: {current_pos}')
+        # print(f'Picked up in function caller: {current_pos}')
     else:
         current_pos = 42.27377897661122, -71.80928749664702
 
     # current_pos = get_gps_coords()
     top_place = destination_search(dest, current_pos)
+    end_time(start)
+
+    # If in Webots, push destination to flag queue
+    if simMode:
+        temp_dict = {'set_destination': top_place['location']}
+        queue_dict['flag'].put(temp_dict)
 
     # *** Instead of printing, pass to global nav ***
     print(f"TOP PLACE: {top_place['displayName']['text']} \n"
           f"{top_place['formattedAddress']} \n"
           f"{top_place['location']}")
 
-    end_time(start)
     tts_via_request(f"Okay! Starting Navigation to {top_place['displayName']['text']}")
 
 

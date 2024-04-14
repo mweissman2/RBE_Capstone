@@ -18,27 +18,25 @@ def destination_search(text_query: str, location: tuple, radius: float = 1609.34
 
     # Request body as a dictionary
     request_body = {
-        "textQuery": text_query
-    }
-
-    locationRestriction = {
-        "circle": {
-            "center": {
-                "latitude": location[0],
-                "longitude": location[1]
-            },
-            "radius": radius
+        "textQuery": text_query,
+        "rankPreference": "DISTANCE",
+        "locationBias": {
+            "circle": {
+                "center": {
+                    "latitude": location[0],
+                    "longitude": location[1]
+                },
+                "radius": radius
+            }
         }
     }
-    location_restriction_json = json.dumps(locationRestriction)
 
     # Request headers
     headers = {
         "Content-Type": "application/json",
-        "X-Goog-Api-Key": API_KEY,
+        "X-Goog-Api-Key": "AIzaSyBGjTo7VmQjaBjBN-PpviWBI4O4wGj7w64",
         # Include field mask for specific data
-        "X-Goog-FieldMask": "places.displayName,places.formattedAddress,places.location",
-        "locationRestriction": location_restriction_json
+        "X-Goog-FieldMask": "places.displayName,places.formattedAddress,places.location"
     }
 
     # Send the POST request with JSON data in body and headers
@@ -58,6 +56,9 @@ def destination_search(text_query: str, location: tuple, radius: float = 1609.34
         #     print(f"Name: {place['displayName']['text']}")
         #     print(f"Address: {place['formattedAddress']}")
         #     print(f"Location: {place['location']}")
+        #     dist_lat = abs(place['location']['latitude'] - location[0])
+        #     dist_long = abs(place['location']['longitude'] - location[1])
+        #     print(f'Distance to start: {dist_lat, dist_long}')
         #     print()
 
         # Return Top place (dictionary)
@@ -73,14 +74,13 @@ def get_gps_coords():
     return 42.27377897661122, -71.80928749664702
 
 
-# # Define search term
-# search_term = "grocery store near WPI"
-#
-# # Get current position
-# lat, long = get_gps_coords()
-#
 # # Run search
-# top_place = destination_search(search_term, location=(lat, long))
-# print(f"TOP PLACE: {top_place['displayName']['text']} \n"
-#       f"{top_place['formattedAddress']} \n"
-#       f"{top_place['location']}")
+# lat, longitude = get_gps_coords()
+# search_term = 'Thai food'
+# top_place = destination_search(search_term, location=(lat, longitude))
+# if top_place is not None:
+#   print(f"TOP PLACE: {top_place['displayName']['text']} \n"
+#         f"{top_place['formattedAddress']} \n"
+#         f"{top_place['location']}")
+# else:
+#   print("No location found within 1 mile")

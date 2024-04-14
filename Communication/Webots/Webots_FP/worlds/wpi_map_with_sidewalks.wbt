@@ -9,6 +9,7 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/project
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/buildings/protos/SimpleBuilding.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/geometries/protos/Extrusion.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/appearances/protos/MattePaint.proto"
+IMPORTABLE EXTERNPROTO "../protos/Destination.proto"
 
 WorldInfo {
   info [
@@ -20,8 +21,8 @@ WorldInfo {
   lineScale 5
 }
 Viewpoint {
-  orientation 0.21931605757755107 0.6976254054822064 -0.6820698355113114 0.7768217211408369
-  position -21.029158204044183 -67.4333282532745 5.3758498346563055
+  orientation 0.20512701328883534 0.6932820609150669 -0.69085663667114 0.7145877029456055
+  position -372.58058364032155 124.37597967229367 228.6129774640939
   near 3
 }
 TexturedBackground {

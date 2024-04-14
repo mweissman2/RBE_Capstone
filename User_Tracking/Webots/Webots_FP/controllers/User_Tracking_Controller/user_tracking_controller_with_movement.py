@@ -2,17 +2,25 @@
 
 # You may need to import some classes of the controller module. Ex:
 #  from controller import Robot, Motor, DistanceSensor
-from controller import Supervisor
+from controller import Supervisor, gps
 import Gimbal_Controller as GC
 import robot_motion_controller.Motion_Controller as MC
 from controller import Keyboard
 import csv
 import os
+import pymap3d as pymap
 
 cwd = os.path.dirname(__file__)
 
+
 #find the robot and user nodes
 robot = Supervisor()
+root = robot.getRoot()
+root_children = root.getField('children')
+world_node = root_children.getMFNode(0)
+gps_reference = world_node.getField('gpsReference').getSFVec3f()
+print(gps_reference)
+ell = pymap.Ellipsoid(6378137.0, 6356752.31424518)
 #get ID of user for tracking.
 user_node = robot.getFromDef('USER')
 user_id = user_node.getId()
@@ -71,6 +79,9 @@ user_tracker.enable_tracking(True)
 user_tracker.set_user_id(user_id)
 print("Tracking started")
 
+dog_node = robot.getFromDef("DOG")
+
+
 
 
 # Main loop:
@@ -84,18 +95,22 @@ while robot.step(timestep) != -1:
 
     key = keyboard.getKey()
 
-    if key == ord('I'):
+    if key == ord('I'): #forward
         vx += 0.1
-    if key == ord('K'):
+    if key == ord('K'): #backward
         vx -= 0.1
-    if key == ord('L'):
+    if key == ord('J'): #left or right
         vy += 0.1
-    if key == ord('J'):
+    if key == ord('L'): #left or right
         vy -= 0.1
-    if key == ord('U'):
+    if key == ord('U'): #rotate
         wz += 0.1
-    if key == ord('O'):
+    if key == ord('O'): #rotate
         wz -= 0.1
+    if key == ord('M'): #stops all movement
+        vx = 0
+        vy = 0
+        wz = 0
 
     vels = [vx, vy, wz]
     print(vels)
@@ -107,7 +122,15 @@ while robot.step(timestep) != -1:
         #print(measured_position)
         # log data
         # get measured data
-        robot_location =GPS.getValues()
+        #robot_location_lat_long = GPS.getValues()
+        #robot_location = pymap.geodetic2enu(robot_location_lat_long[0],
+        #                                        robot_location_lat_long[1],
+        #                                        robot_location_lat_long[2],
+        #                                        gps_reference[0],
+        #                                        gps_reference[1],
+        #                                        gps_reference[2],
+        #                                    ell)
+        robot_location = dog_node.getPosition()
         curr_time = str(robot.getTime())
         meas_x_pos = str(measured_position[0]+robot_location[0])
         meas_y_pos = str(measured_position[1]+robot_location[1])

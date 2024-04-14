@@ -35,8 +35,8 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation -0.18853922551031177 0.5298032142282371 0.826898733000239 0.8981547484452619
-  position -4.1340898332973985 -3.935395013949461 4.043508688277398
+  orientation 0.02588066526710609 -0.005776782988834855 0.9996483481423015 1.8377261251324764
+  position 0.8106609913042209 -3.48251174174994 1.4938145834217964
 }
 TexturedBackground {
 }
@@ -45,13 +45,13 @@ TexturedBackgroundLight {
 Floor {
 }
 DEF USER Pedestrian {
-  translation 0.76067 -0.850336 1.27
+  translation -1.64516 1.55755 1.27
   name "user"
   controller "<none>"
   enableBoundingObject TRUE
 }
 Solid {
-  translation 0.67 0 0.09342527489456763
+  translation -1.49 1.52 -0.00657
   children [
     Shape {
       appearance PBRAppearance {
@@ -66,7 +66,7 @@ Solid {
   }
 }
 DEF DOG Robot {
-  translation 2.11718 1.51331 0.27402
+  translation 0 1.51331 0.27402
   children [
     DEF ROBOT_BASE Solid {
       translation 0 0 -0.0016935350243008074
@@ -183,7 +183,7 @@ DEF DOG Robot {
           ]
           endPoint Solid {
             translation 0.20000000000000004 0.19999999999999996 -0.15
-            rotation -0.08887533204609034 0.7043074026465661 -0.7043097741270847 3.3188769223454604
+            rotation -0.08887533204609034 0.7043074026465662 -0.7043097741270846 3.3188769223454604
             children [
               USE Wheel
             ]
@@ -235,7 +235,7 @@ DEF DOG Robot {
           ]
           endPoint Solid {
             translation -0.20000000000000004 0.19999999999999996 -0.15000000000000002
-            rotation 0.2052722214116438 0.6920477186910434 -0.6920500488918785 2.736674328892199
+            rotation 0.20527222141164378 0.6920477186910436 -0.6920500488918786 2.736674328892199
             children [
               USE Wheel
             ]
@@ -260,7 +260,7 @@ DEF DOG Robot {
           ]
           endPoint Solid {
             translation -0.12 0 0.2
-            rotation 9.0249935671988e-17 0.9999999999999999 0 4.692706653739929e-06
+            rotation 9.024993567198802e-17 1 0 4.692706653739929e-06
             children [
               HingeJoint {
                 jointParameters HingeJointParameters {

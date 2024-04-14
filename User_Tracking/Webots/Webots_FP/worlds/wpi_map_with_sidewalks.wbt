@@ -8,7 +8,6 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/project
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/road/protos/RoadLine.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/buildings/protos/SimpleBuilding.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/geometries/protos/Extrusion.proto"
-EXTERNPROTO "../protos/SeeingEyeRobot.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/humans/pedestrian/protos/Pedestrian.proto"
 
 WorldInfo {
@@ -19,10 +18,36 @@ WorldInfo {
   gpsCoordinateSystem "WGS84"
   gpsReference 42.262915 -71.799635 0
   lineScale 5
+  contactProperties [
+    ContactProperties {
+      material1 "InteriorWheelMat"
+      coulombFriction [
+        0, 2, 0
+      ]
+      frictionRotation -0.785 0
+      bounce 0
+      forceDependentSlip [
+        10, 0
+      ]
+      softCFM 0.0001
+    }
+    ContactProperties {
+      material1 "ExteriorWheelMat"
+      coulombFriction [
+        0, 2, 0
+      ]
+      frictionRotation 0.785 0
+      bounce 0
+      forceDependentSlip [
+        10, 0
+      ]
+      softCFM 0.0001
+    }
+  ]
 }
 Viewpoint {
-  orientation 0.2372190597239922 0.0882595693179896 -0.9674385593553049 2.450560635267936
-  position 378.3370210389113 67.63110103231574 7.589775886253213
+  orientation 0.24375213736458348 0.9092456538455744 -0.33742737958430563 0.08451573839139534
+  position 365.5946294675648 58.703284133359 1.5830128963479027
   near 3
 }
 TexturedBackground {
@@ -9375,6 +9400,10 @@ Road {
   numberOfLanes 1
   speedLimit 13.888889
   lines []
+  roadBorderHeight 0.01
+  roadBorderWidth [
+    3
+  ]
   wayPoints [
     0 0 0
     14.967762 1.748563 0
@@ -9401,6 +9430,10 @@ Road {
   numberOfLanes 1
   speedLimit 13.888889
   lines []
+  roadBorderHeight 0.01
+  roadBorderWidth [
+    3
+  ]
   wayPoints [
     0 0 0
     36.507914 4.270825 0
@@ -9420,6 +9453,9 @@ Road {
     "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/road/protos/textures/road_line_dashed.png"
   ]
   splineSubdivision 0
+  rightBorderBoundingObject TRUE
+  leftBorderBoundingObject TRUE
+  leftBarrierBoundingObject FALSE
 }
 Road {
   translation -400.035365 -78.461367 0.01
@@ -9611,13 +9647,16 @@ Road {
   splineSubdivision 0
 }
 Road {
-  translation 129.24273 122.694876 0.01
+  translation 129.243 122.695 0
   name "Foster Street(7)"
   id "9607103_1"
   startJunction "74658508"
   endJunction "74524669"
   numberOfForwardLanes 2
   speedLimit 13.888889
+  roadBorderWidth [
+    3
+  ]
   wayPoints [
     0 0 0
     -5.202327 2.840394 0
@@ -9641,6 +9680,7 @@ Road {
     "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/road/protos/textures/road_line_triangle.png"
   ]
   splineSubdivision 0
+  rightBorderBoundingObject TRUE
 }
 Road {
   translation 155.754655 126.294326 0.01
@@ -14072,7 +14112,7 @@ Road {
   splineSubdivision 0
 }
 Road {
-  translation -52.22502 271.642954 0.01
+  translation -52.225 271.643 0.01
   name "road(127)"
   id "1163695246_3"
   startJunction "10822508670"
@@ -14501,6 +14541,10 @@ Road {
     RoadLine {
       type "continuous"
     }
+  ]
+  roadBorderHeight 0.02
+  roadBorderWidth [
+    3
   ]
   wayPoints [
     0 0 0
@@ -18675,6 +18719,7 @@ Solid {
 }
 Solid {
   translation 0 0 0.75
+  rotation 0 0 1 1.5708
   children [
     DEF SHAPE Shape {
       appearance PBRAppearance {
@@ -20513,19 +20558,313 @@ DEF parking Pose {
     }
   ]
 }
-DEF DOG SeeingEyeRobot {
-  translation 369.26 58.37 0.25
-  rotation 0 0 1 3.14159
-  controller "<extern>"
-}
 Robot {
   name "supervisor"
   controller "supervisor_controller_auto"
   supervisor TRUE
 }
 DEF USER Pedestrian {
-  translation 371.23 58 1.27
-  rotation 0 0 1 3.14159
+  translation 371.250511861027 58.46134601842449 1.27
   name "user"
   controller "<none>"
+}
+DEF DOG Robot {
+  translation 368.927 58.1633 0.27402
+  rotation 0 0 1 3.14159
+  children [
+    DEF ROBOT_BASE Solid {
+      translation 0 0 -0.0016935350243008074
+      children [
+        InertialUnit {
+          name "imu"
+        }
+        Solid {
+          translation 0.28 0 -0.00999987
+          rotation 0 1 0 -1.5707953071795862
+          children [
+            Lidar {
+              translation 5.87712e-07 0 -0.05
+              rotation 0 1 0 1.5708
+              name "front_lidar"
+            }
+            Shape {
+              appearance MattePaint {
+                baseColor 1 1 0
+              }
+              geometry Capsule {
+                height 0.05
+                radius 0.025
+              }
+            }
+          ]
+          name "Front_Lidar_Solid"
+        }
+        Solid {
+          translation 0.29 0 0.08
+          rotation 0 1 0 -1.5707953071795862
+          children [
+            Shape {
+              appearance MattePaint {
+                baseColor 0 1 1
+              }
+              geometry Cylinder {
+                height 0.05
+                radius 0.02
+              }
+            }
+            Camera {
+              translation 0 0 -0.025
+              rotation 0 1 0 1.5708
+              name "front_camera"
+            }
+          ]
+          name "Front_Camera_Solid"
+        }
+        Solid {
+          translation 0 0 0.15
+          children [
+            Speaker {
+            }
+            Shape {
+              appearance MattePaint {
+                baseColor 0 0.333333 0
+              }
+              geometry Box {
+                size 0.05 0.05 0.05
+              }
+            }
+            GPS {
+            }
+          ]
+          name "GPS"
+        }
+        HingeJoint {
+          jointParameters HingeJointParameters {
+            position -9.998336398374066
+            axis 0 1 0
+            anchor 0.2 -0.2 -0.15
+          }
+          device [
+            RotationalMotor {
+              name "front_right_wheel"
+            }
+            PositionSensor {
+            }
+          ]
+          endPoint Solid {
+            translation 0.20000000000000007 -0.19999999999999996 -0.14999999999999994
+            rotation 0.20414081912427604 0.6922150313240171 -0.6922173620882098 2.738846117967549
+            children [
+              DEF Wheel Shape {
+                appearance MattePaint {
+                  baseColor 0 0 0
+                }
+                geometry DEF Wheel_size Cylinder {
+                  height 0.05
+                  radius 0.125
+                }
+              }
+            ]
+            name "wheel_1"
+            contactMaterial "InteriorWheelMat"
+            boundingObject USE Wheel_size
+            physics Physics {
+            }
+          }
+        }
+        HingeJoint {
+          jointParameters HingeJointParameters {
+            position 15.95901205201921
+            axis 0 1 0
+            anchor 0.2 0.2 -0.15
+          }
+          device [
+            RotationalMotor {
+              name "front_left_wheel"
+            }
+            PositionSensor {
+            }
+          ]
+          endPoint Solid {
+            translation 0.20000000000000004 0.19999999999999996 -0.15
+            rotation -0.08887533204609034 0.7043074026465675 -0.7043097741270833 3.3188769223454604
+            children [
+              USE Wheel
+            ]
+            name "wheel_2"
+            contactMaterial "ExteriorWheelMat"
+            boundingObject USE Wheel_size
+            physics Physics {
+            }
+          }
+        }
+        HingeJoint {
+          jointParameters HingeJointParameters {
+            position 15.96491625001047
+            axis 0 1 0
+            anchor -0.2 -0.2 -0.15
+          }
+          device [
+            RotationalMotor {
+              name "back_right_wheel"
+            }
+            PositionSensor {
+            }
+          ]
+          endPoint Solid {
+            translation -0.2000000000000001 -0.19999999999999996 -0.14999999999999997
+            rotation -0.09097113927172074 0.7041735981207191 -0.7041759691506984 3.323034899252182
+            children [
+              USE Wheel
+            ]
+            name "wheel_3"
+            contactMaterial "ExteriorWheelMat"
+            boundingObject USE Wheel_size
+            physics Physics {
+            }
+          }
+        }
+        HingeJoint {
+          jointParameters HingeJointParameters {
+            position -10.001474225804698
+            axis 0 1 0
+            anchor -0.2 0.2 -0.15
+          }
+          device [
+            RotationalMotor {
+              name "back_left_wheel"
+            }
+            PositionSensor {
+            }
+          ]
+          endPoint Solid {
+            translation -0.20000000000000004 0.19999999999999996 -0.15000000000000002
+            rotation 0.2052722214116437 0.6920477186910438 -0.6920500488918782 2.736674328892199
+            children [
+              USE Wheel
+            ]
+            name "wheel_4"
+            contactMaterial "InteriorWheelMat"
+            boundingObject USE Wheel_size
+            physics Physics {
+            }
+          }
+        }
+        HingeJoint {
+          jointParameters HingeJointParameters {
+            axis 0 0 1
+            anchor -0.12 0 0.2
+          }
+          device [
+            PositionSensor {
+            }
+            RotationalMotor {
+              name "gimbal_j1_motor"
+            }
+          ]
+          endPoint Solid {
+            translation -0.12 0 0.2
+            rotation 9.0249935671988e-17 0.9999999999999999 0 4.692706653739929e-06
+            children [
+              HingeJoint {
+                jointParameters HingeJointParameters {
+                  axis 0 1 0
+                  anchor 0 0 0.08
+                  minStop -0.52
+                  maxStop 0.52
+                }
+                device [
+                  RotationalMotor {
+                    name "gimbal_j2_motor"
+                  }
+                  PositionSensor {
+                  }
+                ]
+                endPoint Solid {
+                  translation 0 0 0.08
+                  rotation 1 0 0 1.5707999999999998
+                  children [
+                    Solid {
+                      rotation -0.9999999999999999 0 0 1.5707953071795862
+                      children [
+                        Camera {
+                          translation 0.034 0 0
+                          name "RGB_camera"
+                          recognitionColors [
+                            0 0 0
+                          ]
+                          fieldOfView 1.518
+                          width 848
+                          height 480
+                          noise 0.01
+                          recognition Recognition {
+                            segmentation TRUE
+                          }
+                        }
+                        RangeFinder {
+                          translation 0.034 0 0
+                          name "range_finder"
+                          fieldOfView 1.52
+                          width 848
+                          height 480
+                          minRange 0.06
+                          maxRange 6
+                          noise 0.0083
+                        }
+                        Shape {
+                          appearance MattePaint {
+                            baseColor 0 0 0
+                          }
+                          geometry Box {
+                            size 0.07 0.18 0.04
+                          }
+                        }
+                      ]
+                      name "Depth_Camera"
+                    }
+                    Shape {
+                      appearance MattePaint {
+                        baseColor 0 0.666667 1
+                      }
+                      geometry Cylinder {
+                        height 0.2
+                        radius 0.03
+                      }
+                    }
+                  ]
+                  name "Gimbal_Joint_2"
+                }
+              }
+              Shape {
+                appearance MattePaint {
+                  baseColor 0.333333 1 1
+                }
+                geometry Cylinder {
+                  height 0.1
+                  radius 0.04
+                }
+              }
+            ]
+            name "Gimbal_Joint_1"
+          }
+        }
+        Shape {
+          appearance MattePaint {
+            baseColor 0.333333 0 1
+          }
+          geometry DEF BASE Box {
+            size 0.6 0.3 0.3
+          }
+        }
+      ]
+      name "Gimbal"
+      boundingObject USE BASE
+      physics Physics {
+      }
+    }
+  ]
+  physics Physics {
+  }
+  controller "<extern>"
+  supervisor TRUE
 }

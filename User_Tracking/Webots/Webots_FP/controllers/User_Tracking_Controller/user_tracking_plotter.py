@@ -39,13 +39,13 @@ time = np.array(time_actual)
 x_pos_actual = np.array(x_pos_actual)
 y_pos_actual = np.array(y_pos_actual)
 
-x_error = np.divide(x_pos_measured-x_pos_actual, x_pos_actual) * 100
-y_error = np.divide(y_pos_measured-y_pos_actual, y_pos_actual) * 100
+x_error = x_pos_measured-x_pos_actual
+y_error = y_pos_measured-y_pos_actual
 
 plt.plot(time_actual, x_error)
 plt.plot(time_actual, y_error)
 plt.xlabel("Simulation Time")
-plt.ylabel("error (%)")
+plt.ylabel("error (m)")
 plt.legend(["X Error", "Y Error"])
 plt.title("Position Estimation Error vs Time")
 plt.show()

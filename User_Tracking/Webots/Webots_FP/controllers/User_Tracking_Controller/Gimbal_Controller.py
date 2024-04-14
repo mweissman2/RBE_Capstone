@@ -50,6 +50,9 @@ class Gimbal_Controller:
         self.pitch_pid_errors = [0, 0]  #last error, error sum
         self.update_time = update_time
         self.user_id = 30
+        self.red_thresh = 64
+        self.green_thresh = 140
+        self.blue_thresh = 51
 
 
     #function which represents finding the user in an initial setup
@@ -74,9 +77,9 @@ class Gimbal_Controller:
 
         #determine last direction
         if pitch_pos_diff > 0:
-            self.last_direction = 1
-        else:
             self.last_direction = -1
+        else:
+            self.last_direction = 1
         #if within an error threshold for image centering, #then calculate depth and angle
         if np.abs(xn_setpoint-x_input) < self.center_error_margin:
             user_location = self.get_user_location(good_frame,[x_input,y_input])
@@ -132,14 +135,28 @@ class Gimbal_Controller:
         image[image > 100] = 0
         #img = np.frombuffer(self.rgb_camera.getImage(), dtype=np.uint8).reshape((self.rgb_camera.getHeight(), self.rgb_camera.getWidth(), 4))
         img_seg = np.frombuffer(self.rgb_camera.getRecognitionSegmentationImage(), dtype=np.uint8).reshape((self.rgb_camera.getHeight(), self.rgb_camera.getWidth(), 4))
-        img_gray = cv.cvtColor(img_seg, cv.COLOR_BGRA2GRAY)
-        ret, img_mask = cv.threshold(img_gray,30, 255, cv.THRESH_BINARY)
+        #separate into colors
+        blue = img_seg[:,:,0]
+        green = img_seg[:,:,1]
+        red = img_seg[:,:,2]
+
+        #set proper thresholds for mask color
+        red_mask = cv.inRange(red, self.red_thresh-1, self.red_thresh+1)
+        green_mask = cv.inRange(green, self.green_thresh-1, self.green_thresh+1)
+        blue_mask = cv.inRange(blue, self.blue_thresh-1, self.blue_thresh+1)
+
+        #new mask based on specified color thresholding
+        red_green_mask = cv.bitwise_and(red_mask, green_mask)
+        all_mask = cv.bitwise_and(red_green_mask, blue_mask)
+
+        #img_gray = cv.cvtColor(img_seg, cv.COLOR_BGRA2GRAY)
+        #ret, img_mask = cv.threshold(img_gray,30, 255, cv.THRESH_BINARY)
         #debug visualization
         #cv.imshow("Segmented Image", img_mask)
         #cv.waitKey(0)
-        masked_image = cv.bitwise_and(image, image, mask=img_mask)
+        masked_image = cv.bitwise_and(image, image, mask=all_mask)
         #divide by 255 because of max value
-        pixel_count = np.sum(img_mask)/255
+        pixel_count = np.sum(all_mask)/255
 
         return masked_image, pixel_count
 
@@ -156,7 +173,7 @@ class Gimbal_Controller:
         depth = np.sum(flattened_image, where=flattened_image>0)/pixel_count
         #print(depth)
         #average together readings from depth image
-        return depth
+        return depth+0.1
 
 
     def get_depth_image(self):
@@ -182,7 +199,7 @@ class Gimbal_Controller:
 
     def interpolate_velocity(self, curr_position):
         #calculate current velocity
-        curr_x_velocity = (curr_position[0]-self.prev_position[0])/(self.update_time/1000)
+        curr_x_velocity = (curr_position[0] - self.prev_position[0])/(self.update_time/1000)
         curr_y_velocity = (curr_position[1] - self.prev_position[1]) / (self.update_time/1000)
 
         self.prev_position = curr_position
@@ -258,12 +275,11 @@ class Gimbal_Controller:
     def calculate_user_position_new(self, depth, angle, user_position_on_image):
         #calculates the distance from left to right given the current depth measurement
         horizontal_distance = np.tan(self.horizontal_fov/2)*depth
-        horizontal_displacement = horizontal_distance*-user_position_on_image[1]
-        #horizontal_displacement = 0
+        horizontal_displacement = horizontal_distance*(-user_position_on_image[0]/0.5)
         position_in_camera_frame = np.array([depth, horizontal_displacement, 0, 1]).reshape(4,1)
 
         tf_matrix = np.array([[np.cos(angle), -np.sin(angle), 0, -0.12], [np.sin(angle), np.cos(angle), 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]])
 
         new_position = np.matmul(tf_matrix, position_in_camera_frame)
 
-        return new_position[1][0], -new_position[0][0]
+        return new_position[0][0], new_position[1][0]

@@ -188,7 +188,7 @@ DEF DOG Robot {
           ]
           endPoint Solid {
             translation 0.20000000000000007 0.19999999999999996 -0.15
-            rotation -0.0888753320461009 0.7043074026464787 -0.7043097741271707 3.3188769223454373
+            rotation -0.08887533204610093 0.7043074026464787 -0.7043097741271707 3.3188769223454373
             children [
               USE Wheel
             ]
@@ -265,7 +265,7 @@ DEF DOG Robot {
           ]
           endPoint Solid {
             translation -0.12 0 0.2
-            rotation 9.024993567198802e-17 1 0 4.692706653739929e-06
+            rotation 9.0249935671988e-17 0.9999999999999999 0 4.692706653739929e-06
             children [
               HingeJoint {
                 jointParameters HingeJointParameters {
@@ -368,7 +368,7 @@ DEF DOG Robot {
   ]
   physics Physics {
   }
-  controller "<none>"
+  controller "<extern>"
   supervisor TRUE
 }
 Robot {

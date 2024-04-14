@@ -9,7 +9,7 @@ with open(config_path) as f:
 genai.configure(api_key=GEMINI_API_KEY)
 
 # Select Model
-model = genai.GenerativeModel('gemini-pro')
+model = genai.GenerativeModel('gemini-1.0-pro')
 
 # Initialize chat
 chat = model.start_chat(history=[])

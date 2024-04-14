@@ -24,3 +24,24 @@ def get_key(key_name):
     #     elevenlabs.set_api_key(KEY)
 
     return KEY
+
+def set_gemini_safety_settings():
+    safety_settings = [
+        {
+            "category": "HARM_CATEGORY_HARASSMENT",
+            "threshold": "block_none"
+        },
+        {
+            "category": "HARM_CATEGORY_HATE_SPEECH",
+            "threshold": "block_none"
+        },
+        {
+            "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+            "threshold": "block_none"
+        },
+        {
+            "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
+            "threshold": "block_none"
+        },
+    ]
+    return safety_settings

@@ -2,9 +2,6 @@ import json
 import requests
 from Communication import utils
 
-# Replace YOUR_API_KEY with your actual Google Places API key
-API_KEY = utils.get_key("GOOGLE_MAPS_API_KEY")
-
 
 def destination_search(text_query: str, location: tuple, radius: float = 1609.344) -> dict:
     """
@@ -34,7 +31,7 @@ def destination_search(text_query: str, location: tuple, radius: float = 1609.34
     # Request headers
     headers = {
         "Content-Type": "application/json",
-        "X-Goog-Api-Key": "AIzaSyBGjTo7VmQjaBjBN-PpviWBI4O4wGj7w64",
+        "X-Goog-Api-Key": utils.get_key("GOOGLE_MAPS_API_KEY"),
         # Include field mask for specific data
         "X-Goog-FieldMask": "places.displayName,places.formattedAddress,places.location"
     }

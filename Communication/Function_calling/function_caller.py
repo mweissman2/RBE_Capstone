@@ -50,7 +50,10 @@ def function_caller(input_string: str, queue_dict: dict[str, Queue], simMode):
     # FOR DEBUGGING ONLY - REMOVE LATER
     else:
         print("No function called")
-        print(response.text)
+        try:
+            print(response.text)
+        except ValueError:
+            pass
         end_time(start)
 
 

@@ -58,9 +58,6 @@ def main():
     manager = CommsManager(queue_dict, simMode=True)
     manager.run_processes()
 
-    # counter for destination
-    counter = 0
-
     # i = 0
     while robot.step(timestep) != -1:
         # if i == 50:
@@ -82,16 +79,14 @@ def main():
             # Convert lat/long to position
             # x, y, z = latlong_2_pos(world_node, destination)
             [lat_ref, long_ref, h_ref] = world_node.getField('gpsReference').getSFVec3f()
-            x, y, z = pymap3d.geodetic2enu(destination[0], destination[1], h_ref, lat_ref, long_ref, h_ref)
+            x, y, _ = pymap3d.geodetic2enu(destination[0], destination[1], h_ref, lat_ref, long_ref, h_ref)
 
             # Spawn destination beacon in Webots
-            if counter == 0:
-                children_field.importMFNodeFromString(-1, f'DEF DESTINATION Destination {{ translation {x} {y} {z} }}')
-            else:
-                destination_node = robot.getFromDef('DESTINATION')
-                translation_field = destination_node.getField('translation')
-                translation_field.setSFVec3f([x, y, z])
-            counter += 1
+            # if counter == 0:
+            # children_field.importMFNodeFromString(-1, f'DEF DESTINATION Destination {{ translation {x} {y} {50} }}')
+            destination_node = robot.getFromDef('DESTINATION')
+            translation_field = destination_node.getField('translation')
+            translation_field.setSFVec3f([x, y, 50])
 
         # i += 1
         # key = keyboard.getKey()

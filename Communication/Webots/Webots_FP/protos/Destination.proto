@@ -18,25 +18,35 @@
 
 
 PROTO Destination [
-    field SFFloat radius 10
-    field SFFloat height 100
     field SFVec3f translation 0 0 0
     field SFRotation rotation 0 0 1 0
     field SFString name "destination"
 ]
 {
     Transform {
-        translation IS translation
-        rotation IS rotation
-        children [
-            Shape {
-                geometry Cylinder {
-                    radius IS radius
-                    height IS height
+          translation IS translation
+          rotation IS rotation
+          name IS name
+          children [
+            Solid {
+              children [
+                Shape {
+                    appearance Appearance {
+                        material Material {
+                            ambientIntensity 0.2
+                            diffuseColor 1 0 0
+                            emissiveColor 0 0 0
+                            shininess 0.2
+                            specularColor 0 0 0
+                            transparency 0.2
+                        }
+                    }
+                  geometry Cylinder {
+                    height 100
+                    radius 10
+                  }
                 }
-                appearance Appearance {
-                    material Material {}
-                }
+              ]
             }
         ]
     }

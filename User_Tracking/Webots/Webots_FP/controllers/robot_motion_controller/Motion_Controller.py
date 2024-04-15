@@ -124,8 +124,11 @@ class Motion_Controller:
     def get_encoder_reading(self, wheel):
         return 0
 
-    def set_current_position(self):
-        pose = self.localization.getValues()
+    def set_current_position(self, robot_position = None):
+        if robot_position is not None:
+            pose = [robot_position[0], robot_position[1]]
+        else:
+            pose = self.localization.getValues()
         heading = self.heading.getRollPitchYaw()
         self.current_position = [pose[0], pose[1], heading[2]]
 
@@ -245,6 +248,7 @@ class Motion_Controller:
         self.goal_time = curr_time+time
 
         heading_delta = goal_position[2] - self.current_position[2]
+        #heading_delta = 0
         x_delta = goal_position[0] - self.current_position[0]
         y_delta = goal_position[1] - self.current_position[1]
 
@@ -252,6 +256,11 @@ class Motion_Controller:
             angular_velocity = 0
             velocities = np.array([x_delta/time, y_delta/time]).reshape(2,1)
         else:
+            if heading_delta > np.pi:
+                heading_delta = 2*np.pi - heading_delta
+            elif heading_delta < -np.pi:
+                heading_delta = heading_delta + 2*np.pi
+
             angular_velocity = heading_delta / time
 
             m11 = (np.sin(angular_velocity*time))/angular_velocity
@@ -264,24 +273,24 @@ class Motion_Controller:
             ym = y_delta
 
             velocities = np.matmul(np.linalg.inv(np.array([[m11, m12],[m21, m22]])), np.array([xm, ym]).reshape(2,1))
-            print(velocities)
+            #print(velocities)
         self.goal_position = goal_position
 
         self.x_vel_traj = velocities[0][0]
         self.y_vel_traj = velocities[1][0]
         self.z_vel_traj = angular_velocity
 
-    def move(self, curr_time):
-        self.set_current_position()
+    def move(self, curr_time, robot_position):
+        self.set_current_position(robot_position)
         self.curr_time = curr_time
-        print(self.current_position)
+        #print(self.current_position)
 
         if self.curr_time > self.goal_time+0.5:
             print("missed the target")
             if abs(self.current_position[0] - self.goal_position[0]) <= self.error_epsilon*5:
                 if abs(self.current_position[1] - self.goal_position[1]) <= self.error_epsilon*5:
                     print("Close to Goal")
-                    self.at_goal_position()
+                    self.at_goal_position() #TODO
                     return False
 
 

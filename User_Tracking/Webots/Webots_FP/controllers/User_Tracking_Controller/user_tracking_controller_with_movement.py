@@ -5,6 +5,8 @@
 from controller import Supervisor, gps
 import Gimbal_Controller as GC
 import robot_motion_controller.Motion_Controller as MC
+import obstacle_detector.obstacle_detector as OD
+import numpy as np
 from controller import Keyboard
 import csv
 import os
@@ -57,6 +59,9 @@ depth_camera = (robot.getDevice('range_finder'))
 rgb_camera.enable(camera_timestep)
 depth_camera.enable(camera_timestep)
 
+front_camera = robot.getDevice('front_camera')
+front_camera.enable(camera_timestep)
+
 #get joint objects
 joint_names = ['gimbal_j1_motor', 'gimbal_j2_motor']
 for names in joint_names:
@@ -77,7 +82,14 @@ user_tracker = GC.Gimbal_Controller(rgb_camera, depth_camera, gimbal_joints,came
 #enables computer vision and sets the ID for user recognition
 user_tracker.enable_tracking(True)
 user_tracker.set_user_id(user_id)
-print("Tracking started")
+
+# initialize the obstacle detector
+front_cam_tf_matrix = np.array([[1,0,0,0.305],
+                                [0,1,0,0],
+                                [0,0,1,0],
+                                [0,0,0,1]])
+front_obs_detect = OD.ObstacleDetector(front_camera, front_cam_tf_matrix, camera_timestep)
+front_obs_detect.camera_location = 'front'
 
 dog_node = robot.getFromDef("DOG")
 
@@ -90,9 +102,15 @@ i = 0
 vx = 0
 vy = 0
 wz = 0
-while robot.step(timestep) != -1:
-    #set motor control
+first = True
+curr_time = 0
 
+while robot.step(timestep) != -1:
+    curr_time = robot.getTime()
+    robot_location = dog_node.getPosition()
+    obstacle_dictionary = front_obs_detect.get_camera_obstacles(robot_location)
+
+    #manual control of robot
     key = keyboard.getKey()
 
     if key == ord('I'): #forward
@@ -114,7 +132,15 @@ while robot.step(timestep) != -1:
 
     vels = [vx, vy, wz]
     print(vels)
-    my_controller.set_velocity(vx,vy,wz)
+    #my_controller.set_velocity(vx,vy,wz)
+
+    #code block for sending one waypoint and moving the robot
+    if first:
+        my_controller.set_current_position(robot_location)
+        my_controller.new_plan_trajectory([robot_location[0]-5,robot_location[1]-1,-0.5],8, curr_time)
+        first = False
+
+    done_flag = my_controller.move(curr_time, robot_location)
 
 
     if i == 3:
@@ -130,7 +156,6 @@ while robot.step(timestep) != -1:
         #                                        gps_reference[1],
         #                                        gps_reference[2],
         #                                    ell)
-        robot_location = dog_node.getPosition()
         curr_time = str(robot.getTime())
         meas_x_pos = str(measured_position[0]+robot_location[0])
         meas_y_pos = str(measured_position[1]+robot_location[1])
@@ -146,7 +171,7 @@ while robot.step(timestep) != -1:
         i = 0
     i += 1
     key = keyboard.getKey()
-    if key==ord('{'): #letter {
+    if key == ord('{'): #letter {
         break
 
     pass

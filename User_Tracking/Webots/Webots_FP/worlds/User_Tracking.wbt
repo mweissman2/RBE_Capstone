@@ -35,8 +35,8 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation 0.02588066526710609 -0.005776782988834855 0.9996483481423015 1.8377261251324764
-  position 0.8106609913042209 -3.48251174174994 1.4938145834217964
+  orientation -0.14897207027803464 -0.015299167692742314 0.9887230440042277 4.056031569861124
+  position 1.9675155141285086 3.9499421592827115 1.190947474020383
 }
 TexturedBackground {
 }
@@ -66,7 +66,8 @@ Solid {
   }
 }
 DEF DOG Robot {
-  translation 0 1.51331 0.27402
+  translation -3.84707 -1.11332 0.274719
+  rotation 0.9999999999978882 -8.809169583550814e-07 -1.8567763935675413e-06 2.4613368446326262e-08
   children [
     DEF ROBOT_BASE Solid {
       translation 0 0 -0.0016935350243008074
@@ -96,8 +97,8 @@ DEF DOG Robot {
           name "Front_Lidar_Solid"
         }
         Solid {
-          translation 0.29 0 0.08
-          rotation 0 1 0 -1.5707953071795862
+          translation 0.28 0 0.1
+          rotation 0.7071072811865696 -3.3905013482585576e-09 0.7071062811861719 3.14159
           children [
             Shape {
               appearance MattePaint {
@@ -109,9 +110,18 @@ DEF DOG Robot {
               }
             }
             Camera {
-              translation 0 0 -0.025
-              rotation 0 1 0 1.5708
+              translation 2.12131e-07 9.4058e-08 0.025
+              rotation -0.707108281185553 -3.3905013482517768e-09 -0.70710528118436 -3.1415853071795863
               name "front_camera"
+              fieldOfView 1.52
+              width 858
+              height 480
+              recognition Recognition {
+                maxRange 20
+                frameColor 0.109804 0.909804 1
+                frameThickness 3
+                segmentation TRUE
+              }
             }
           ]
           name "Front_Camera_Solid"
@@ -136,7 +146,7 @@ DEF DOG Robot {
         }
         HingeJoint {
           jointParameters HingeJointParameters {
-            position -9.998336398374066
+            position -9.998336398221554
             axis 0 1 0
             anchor 0.2 -0.2 -0.15
           }
@@ -149,7 +159,7 @@ DEF DOG Robot {
           ]
           endPoint Solid {
             translation 0.20000000000000007 -0.19999999999999996 -0.14999999999999994
-            rotation 0.20414081912427604 0.6922150313240171 -0.6922173620882098 2.738846117967549
+            rotation 0.2041408190692902 0.692215031332125 -0.6922173620963176 2.7388461180731207
             children [
               DEF Wheel Shape {
                 appearance MattePaint {
@@ -170,7 +180,7 @@ DEF DOG Robot {
         }
         HingeJoint {
           jointParameters HingeJointParameters {
-            position 15.95901205201921
+            position 15.959012051842866
             axis 0 1 0
             anchor 0.2 0.2 -0.15
           }
@@ -183,7 +193,7 @@ DEF DOG Robot {
           ]
           endPoint Solid {
             translation 0.20000000000000004 0.19999999999999996 -0.15
-            rotation -0.08887533204609034 0.7043074026465662 -0.7043097741270846 3.3188769223454604
+            rotation -0.0888753319834993 0.7043074026505156 -0.7043097741310335 3.3188769222212597
             children [
               USE Wheel
             ]
@@ -196,7 +206,7 @@ DEF DOG Robot {
         }
         HingeJoint {
           jointParameters HingeJointParameters {
-            position 15.96491625001047
+            position 15.9649162498344
             axis 0 1 0
             anchor -0.2 -0.2 -0.15
           }
@@ -209,7 +219,7 @@ DEF DOG Robot {
           ]
           endPoint Solid {
             translation -0.2000000000000001 -0.19999999999999996 -0.14999999999999997
-            rotation -0.09097113927172074 0.7041735981207191 -0.7041759691506984 3.323034899252182
+            rotation -0.09097113920921597 0.7041735981247564 -0.7041759691547359 3.323034899128199
             children [
               USE Wheel
             ]
@@ -222,7 +232,7 @@ DEF DOG Robot {
         }
         HingeJoint {
           jointParameters HingeJointParameters {
-            position -10.001474225804698
+            position -10.0014742256525
             axis 0 1 0
             anchor -0.2 0.2 -0.15
           }
@@ -235,7 +245,7 @@ DEF DOG Robot {
           ]
           endPoint Solid {
             translation -0.20000000000000004 0.19999999999999996 -0.15000000000000002
-            rotation 0.20527222141164378 0.6920477186910436 -0.6920500488918786 2.736674328892199
+            rotation 0.2052722213567602 0.6920477186991835 -0.6920500489000179 2.7366743289975277
             children [
               USE Wheel
             ]

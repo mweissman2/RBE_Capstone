@@ -40,10 +40,12 @@ x_pos_actual = np.array(x_pos_actual)
 y_pos_actual = np.array(y_pos_actual)
 
 x_error = x_pos_measured-x_pos_actual
+x_zero_mean = x_error - np.mean(x_error)
 y_error = y_pos_measured-y_pos_actual
+y_zero_mean = y_error - np.mean(y_error)
 
-plt.plot(time_actual, x_error)
-plt.plot(time_actual, y_error)
+plt.plot(time_actual, x_zero_mean)
+plt.plot(time_actual, x_zero_mean)
 plt.xlabel("Simulation Time")
 plt.ylabel("error (m)")
 plt.legend(["X Error", "Y Error"])

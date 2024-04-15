@@ -4,24 +4,47 @@
 #  from controller import Robot, Motor, DistanceSensor
 from controller import Robot
 from controller import Supervisor
-from controller import Keyboard, Speaker
+from controller import Keyboard
 from Communication.CommsManager import *
+from navigation.global_planner import google_planner, latlong2string, extract_waypoints
 from multiprocessing import Process, Queue
-import numpy as np
 import pymap3d
-import os
 
 
-def latlong_2_pos(world_node, latlong: tuple[float, float]) -> tuple[float, float, float]:
-    """
-    Converts lat/long to x,y,z
-    :param latlong: a tuple of latitude, longitude
-    :return: a tuple of floats (x,y,z)
-    """
-    [lat_ref, long_ref, _] = world_node.getField('gpsReference').getSFVec3f()
-    lat_diff_meters = (latlong[0] - lat_ref) * 111132.92
-    long_diff_meters = (latlong[1] - long_ref) * (111321.377 * np.cos(np.radians(lat_ref)))
-    return lat_diff_meters, long_diff_meters, 0
+def latlong_2_pos(world_node, latlong: tuple[float, float]) -> tuple[float, float]:
+    [lat_ref, long_ref, h_ref] = world_node.getField('gpsReference').getSFVec3f()
+    x, y, _ = pymap3d.geodetic2enu(latlong[0], latlong[1], h_ref, lat_ref, long_ref, h_ref)
+    return x, y
+
+
+def find_waypoints(world_node, start: tuple[float, float], end: tuple[float, float]):
+    # Convert start and end to strings
+    start = latlong2string(start)
+    end = latlong2string(end)
+
+    # print(f'start: {start}, end: {end}')
+
+    # Get route and extract waypoints
+    route = google_planner(start, end)
+    waypoints = extract_waypoints(route)
+
+    # Convert waypoints to x-y-z positions
+    new_waypoints = [latlong_2_pos(world_node, waypoint) for waypoint in waypoints]
+    # print('waypoints', waypoints)
+    # print(new_waypoints)
+    return new_waypoints
+
+
+def spawn_waypoints(waypoints, children):
+    for waypoint in waypoints:
+        children.importMFNodeFromString(-1,
+                                        f'DEF WAYPOINT Waypoint {{translation {waypoint[0]} {waypoint[1]} {25} }}')
+
+
+def remove_waypoints(robot, waypoints):
+    for _ in range(len(waypoints)):
+        waypoint_node = robot.getFromDef('WAYPOINT')
+        waypoint_node.remove()
 
 
 # Main loop:
@@ -50,13 +73,14 @@ def main():
     GPS = robot.getDevice('gps')
     GPS.enable(timestep)
 
-    # get speaker for output comms
-    # speaker = robot.getDevice('speaker')
-
     # Create and run comms manager
     queue_dict = {'audio': Queue(), 'transcription': Queue(), 'response': Queue(), 'position': Queue(), 'flag': Queue()}
     manager = CommsManager(queue_dict, simMode=True)
     manager.run_processes()
+
+    # Counter for destinations
+    first_time_counter = 0
+    waypoints = []
 
     # i = 0
     while robot.step(timestep) != -1:
@@ -77,16 +101,25 @@ def main():
             print(f"SET DESTINATION RECEIVED: {destination}")
 
             # Convert lat/long to position
-            # x, y, z = latlong_2_pos(world_node, destination)
-            [lat_ref, long_ref, h_ref] = world_node.getField('gpsReference').getSFVec3f()
-            x, y, _ = pymap3d.geodetic2enu(destination[0], destination[1], h_ref, lat_ref, long_ref, h_ref)
+            x, y = latlong_2_pos(world_node, destination)
 
             # Spawn destination beacon in Webots
-            # if counter == 0:
-            # children_field.importMFNodeFromString(-1, f'DEF DESTINATION Destination {{ translation {x} {y} {50} }}')
-            destination_node = robot.getFromDef('DESTINATION')
-            translation_field = destination_node.getField('translation')
-            translation_field.setSFVec3f([x, y, 50])
+            if first_time_counter == 0:
+                children_field.importMFNodeFromString(-1, f'DEF DESTINATION Destination {{ translation {x} {y} {50} }}')
+                first_time_counter = 1
+            else:
+                # Remove current waypoints
+                remove_waypoints(robot, waypoints)
+
+                # Move destination
+                destination_node = robot.getFromDef('DESTINATION')
+                translation_field = destination_node.getField('translation')
+                translation_field.setSFVec3f([x, y, 50])
+
+            # Spawn waypoints to destination
+            current_pos = (GPS.getValues()[0], GPS.getValues()[1])
+            waypoints = find_waypoints(world_node, current_pos, destination)
+            spawn_waypoints(waypoints, children_field)
 
         # i += 1
         # key = keyboard.getKey()

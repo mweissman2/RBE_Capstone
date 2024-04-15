@@ -4,7 +4,7 @@ from occupancy_map import *
 from apf_planner import *
 import matplotlib.path as mplpath
 import matplotlib.pyplot as plt
-
+import time
 
 if __name__ == "__main__":
 
@@ -29,14 +29,13 @@ if __name__ == "__main__":
     cone_vertices_list = []
     vo_path_list = []
 
-
+    nav_start_time = time.time()
     vo_algo = velocityObstacle()
-
-    o_map = OccupancyMap(100,100)
+    o_map = OccupancyMap(100,100)       # this is where the occupancy map would go in
     # o_map.test_grid()    # create test grid
 
     inflate_radius = 3
-    # add computational time data
+
     vo_algo.update_obstacles(obstacles,inflate_radius)         # also add argument for the radius of the obstacles
     for i in range(len(obstacles)):
         current_cone_vertices = vo_algo.vo_calculation(o_map.occupancy_grid, robot_pos, o_velocity[i], robot_velocity)
@@ -67,8 +66,26 @@ if __name__ == "__main__":
     y_path = [coord[1] for coord in local_path]
     plt.plot(x_path, y_path, linestyle='-', color='b', label='Coordinates')
     print(local_path)
+    nav_end_time = time.time()
+    result_time = nav_end_time - nav_start_time
 
 
+    # saving data
+    # File path
+    file_path = "apf_vo_time_data.txt"
+
+    # Open the file in append mode (create if not exist)
+    with open(file_path, 'a+') as file:
+        # Move the cursor to the start of the file
+        file.seek(0)
+        # Check if the file is empty
+        if not file.read():
+            # If the file is empty, write the variable's value to the file
+            file.write(f'{nav_start_time},{result_time}')
+        else:
+            # If the file is not empty, move the cursor to the end of the file and add a new line before writing
+            file.seek(0, 2)
+            file.write('\n' + f'{nav_start_time},{result_time}')
 
 
     # Plot the points

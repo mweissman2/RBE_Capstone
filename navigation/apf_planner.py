@@ -129,7 +129,6 @@ class APF_Planner:
         elif math.pi - degree_threshold_22 >= angle_to_approach >= math.pi/2 + degree_threshold_22:    # northwest
             next_point = [current_pose[0] - 1, current_pose[1] + 1]
 
-                
         return next_point
 
     def get_distance(self,first_point,second_point):

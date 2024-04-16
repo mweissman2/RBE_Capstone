@@ -37,7 +37,7 @@ def relevancy_subscriber(queue_dict: dict[str, Queue], simMode: bool):
             else:
                 print("RELEVANCY SUB: No function call")
                 response = chat.send_message(
-                    transcription
+                    transcription + "Keep your response concise."
                 )
                 tts_via_request("That's not one of my core features, but here's the answer:" + response.text)
 
@@ -59,8 +59,7 @@ def relevancy_check(input_str: str, func_list: list, func_embeddings, example_em
     result = genai.embed_content(
         model="models/embedding-001",
         content=[input_str],
-        task_type="retrieval_document",
-        title="Embedding of list of strings"
+        task_type="semantic_similarity"
     )
     input_embedding = result['embedding'][0]  # Extract embedding for the input string
 
@@ -81,7 +80,7 @@ def relevancy_check(input_str: str, func_list: list, func_embeddings, example_em
             most_relevant_command = func
 
     print(f'max similarity: {max_similarity}')
-    if max_similarity > 0.75:
+    if max_similarity > 0.70:
         return True
     else:
         return False
@@ -107,29 +106,40 @@ def get_embeddings():
         {'name': 'global_nav',
          'description': 'Initiates global navigation from the current location to a specified destination.',
          'examples': ['Start navigating from home to the nearest bus stop.',
-                      'Navigate to the grocery store on Main Street.']},
+                      'Navigate to the grocery store on Main Street.',
+                      'Take me to the closest Thai Restaurant',
+                      'Lets go to the library',
+                      'Can you bring me to the theater?',
+                      'Take me to Jimmy Johns',
+                      'Lets navigate to TD Bank',
+                      'Bring me to Gong Cha Bubble Tea']},
 
         {'name': 'change_speed',
          'description': 'Adjusts the speed of the system, with options to increase, decrease, or maintain the current velocity.',
          'examples': ['Increase speed to move faster through open spaces.',
                       'Decrease speed to navigate safely in crowded areas.',
-                      'Maintain current speed while traversing familiar routes.']},
+                      'Maintain current speed while traversing familiar routes.',
+                      'Lets start moving a bit faster',
+                      'Woah, lets slow down there']},
 
         {'name': 'describe_env',
          'description': 'Utilizes system cameras to provide verbal descriptions of the environment surrounding the user.',
-         'examples': ['Describe the objects and obstacles in front of the user.',
-                      'Identify landmarks to provide orientation cues.',
-                      'Alert the user to potential hazards, such as stairs or obstacles.']},
+         'examples': ['Describe the objects and obstacles in front of me.',
+                      'Were in the park right? What does it look like?',
+                      'Do I have to worry about any obstacles ahead of me?',
+                      'Are there any other people around?']},
 
         {'name': 'system_stop',
          'description': 'Brings the system to a complete stop, halting all movement and navigation activities.',
          'examples': ['Stop the system in case of an emergency or unexpected obstacle.',
-                      'Pause navigation temporarily to address user queries or preferences.']},
+                      'Pause navigation',
+                      'Stop!']},
 
         {'name': 'system_go',
          'description': 'Resumes system operations and navigation after being stopped or paused.',
-         'examples': ['Continue navigation to the original destination after a brief pause.',
-                      'Resume system operations after addressing user queries or preferences.']}
+         'examples': ['Okay, lets keep moving',
+                      'Resume system operations',
+                      'Sorry I had to tie my shoe, lets keep going now']}
     ]
 
     # Precompute function embeddings
@@ -140,8 +150,7 @@ def get_embeddings():
     result = genai.embed_content(
         model="models/embedding-001",
         content=content,
-        task_type="retrieval_document",
-        title="Embedding of list of strings"
+        task_type="semantic_similarity"
     )
 
     func_embeddings = result['embedding'][:len(func_list)]  # Extract embeddings for function descriptions

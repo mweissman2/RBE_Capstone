@@ -11,6 +11,7 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/project
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/appearances/protos/MattePaint.proto"
 IMPORTABLE EXTERNPROTO "../protos/Destination.proto"
 IMPORTABLE EXTERNPROTO "../protos/Waypoint.proto"
+IMPORTABLE EXTERNPROTO "../protos/Line.proto"
 
 WorldInfo {
   info [
@@ -20610,8 +20611,8 @@ DEF DOG Robot {
             }
           ]
           endPoint Solid {
-            translation 0.20000000000000284 -0.1999999999999993 -0.14999999999999997
-            rotation 1 -9.447073881033628e-09 9.44710606789386e-09 1.5707996938994835
+            translation 0.19999999999999993 -0.19999999999999996 -0.14999999999999997
+            rotation 1 -9.447073871157243e-09 9.447105983803854e-09 1.5707996938994835
             children [
               DEF Wheel Shape {
                 appearance MattePaint {
@@ -20642,8 +20643,8 @@ DEF DOG Robot {
             }
           ]
           endPoint Solid {
-            translation 0.19999999999998863 0.19999999999999218 -0.14999999999999997
-            rotation 1 9.468034658611148e-09 -9.468066688424362e-09 1.5707996938994846
+            translation 0.19999999999999993 0.19999999999999996 -0.14999999999999997
+            rotation 1 9.468034586313515e-09 -9.468066631732763e-09 1.5707996938994848
             children [
               USE Wheel
             ]
@@ -20666,8 +20667,8 @@ DEF DOG Robot {
             }
           ]
           endPoint Solid {
-            translation -0.19999999999998863 -0.20000000000000284 -0.14999999999999997
-            rotation 1 9.468019742757893e-09 -9.468051223039672e-09 1.5707996938994866
+            translation -0.19999999999999998 -0.19999999999999996 -0.15
+            rotation 1 9.46801963545458e-09 -9.468051248407502e-09 1.5707996938994868
             children [
               USE Wheel
             ]
@@ -20690,8 +20691,8 @@ DEF DOG Robot {
             }
           ]
           endPoint Solid {
-            translation -0.20000000000000284 0.1999999999999993 -0.14999999999999997
-            rotation 1 -9.447090523985621e-09 9.447122946359327e-09 1.5707996938994937
+            translation -0.19999999999999998 0.19999999999999996 -0.15
+            rotation 1 -9.447090516130028e-09 9.447122819853428e-09 1.5707996938994941
             children [
               USE Wheel
             ]

@@ -9,12 +9,28 @@ from Communication.CommsManager import *
 from navigation.global_planner import google_planner, latlong2string, extract_waypoints
 from multiprocessing import Process, Queue
 import pymap3d
+import math
 
 
 def latlong_2_pos(world_node, latlong: tuple[float, float]) -> tuple[float, float]:
     [lat_ref, long_ref, h_ref] = world_node.getField('gpsReference').getSFVec3f()
     x, y, _ = pymap3d.geodetic2enu(latlong[0], latlong[1], h_ref, lat_ref, long_ref, h_ref)
     return x, y
+
+
+def calculate_midpoint(point1, point2):
+    return ((point1[0] + point2[0]) / 2, (point1[1] + point2[1]) / 2)
+
+
+def calculate_heading(point1, point2):
+    dx = point2[0] - point1[0]
+    dy = point2[1] - point1[1]
+    angle = math.atan2(dy, dx)  # Calculate angle in radians
+    return angle
+
+
+def calculate_distance(point1, point2):
+    return math.sqrt((point2[0] - point1[0]) ** 2 + (point2[1] - point1[1]) ** 2)
 
 
 def find_waypoints(world_node, start: tuple[float, float], end: tuple[float, float]):
@@ -40,11 +56,36 @@ def spawn_waypoints(waypoints, children):
         children.importMFNodeFromString(-1,
                                         f'DEF WAYPOINT Waypoint {{translation {waypoint[0]} {waypoint[1]} {25} }}')
 
+def spawn_single_line(point1, point2, children):
+    midpoint = calculate_midpoint(point1, point2)
+    heading = calculate_heading(point1, point2)
+    distance = calculate_distance(point1, point2)
+    children.importMFNodeFromString(-1,
+                                    f'DEF LINE Line {{translation {midpoint[0]} {midpoint[1]} {0} rotation 0 0 1 {heading} size {distance} 1.5 1 }}')
+
+def spawn_lines(start, end, waypoints, children):
+    # Spawn line between start and first waypoint
+    spawn_single_line(start, waypoints[0], children)
+
+    # Spawn lines between all waypoints
+    for i in range(len(waypoints) - 1):
+        waypoint1 = waypoints[i]
+        waypoint2 = waypoints[i + 1]
+        spawn_single_line(waypoint1, waypoint2, children)
+
+    # Spawn line between last waypoint and destination
+    spawn_single_line(waypoints[-1], end, children)
+
 
 def remove_waypoints(robot, waypoints):
     for _ in range(len(waypoints)):
         waypoint_node = robot.getFromDef('WAYPOINT')
         waypoint_node.remove()
+
+def remove_lines(robot, waypoints):
+    for _ in range(len(waypoints)+1):
+        line_node = robot.getFromDef('LINE')
+        line_node.remove()
 
 
 # Main loop:
@@ -110,6 +151,7 @@ def main():
             else:
                 # Remove current waypoints
                 remove_waypoints(robot, waypoints)
+                remove_lines(robot, waypoints)
 
                 # Move destination
                 destination_node = robot.getFromDef('DESTINATION')
@@ -120,6 +162,7 @@ def main():
             current_pos = (GPS.getValues()[0], GPS.getValues()[1])
             waypoints = find_waypoints(world_node, current_pos, destination)
             spawn_waypoints(waypoints, children_field)
+            spawn_lines(latlong_2_pos(world_node, current_pos), latlong_2_pos(world_node, destination), waypoints, children_field)
 
         # i += 1
         # key = keyboard.getKey()

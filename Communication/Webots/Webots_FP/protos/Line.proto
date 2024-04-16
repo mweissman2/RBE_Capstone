@@ -17,10 +17,11 @@
 # template language: javascript
 
 
-PROTO Destination [
+PROTO Line [
     field SFVec3f translation 0 0 0
     field SFRotation rotation 0 0 1 0
-    unconnectedField SFString name "destination"
+    unconnectedField SFString name "line"
+    field SFVec3f size 5 5 1
 ]
 {
     Solid {
@@ -31,16 +32,15 @@ PROTO Destination [
             appearance Appearance {
                 material Material {
                     ambientIntensity 0.2
-                    diffuseColor 1 0 0
+                    diffuseColor 0 0 1
                     emissiveColor 0 0 0
                     shininess 0.2
                     specularColor 0 0 0
                     transparency 0.2
                 }
             }
-            geometry Cylinder {
-                height 100
-                radius 10
+            geometry Box {
+                size IS size
             }
         }
 

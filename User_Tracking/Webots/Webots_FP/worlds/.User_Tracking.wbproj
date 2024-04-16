@@ -9,6 +9,6 @@ orthographicViewHeight: 1
 textFiles: -1
 globalOptionalRendering: ContactPoints::CameraFrustums::ConnectorAxes
 consoles: Console:All:All
-renderingDevicePerspectives: robot:RGB_camera;1;0.335938;0.0071023;0
-renderingDevicePerspectives: robot:front_camera;1;1.59375;0;0.220026
+renderingDevicePerspectives: robot:RGB_camera;1;0.0666667;0;0
+renderingDevicePerspectives: robot:front_camera;1;0.0666667;0;0.220026
 renderingDevicePerspectives: robot:range_finder;0;0.0666667;0;0.200084

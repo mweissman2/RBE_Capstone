@@ -4,6 +4,7 @@
 import googlemaps
 from datetime import datetime
 import queue
+from Communication import utils
 
 def extract_api_key():
     # extracts API key on your desktop for use in google_planner
@@ -33,9 +34,9 @@ def google_planner(start, goal):
     Must be string of address that is passed to the directions method
     '''
     # api_key = extract_api_key()
-    api_key = ''             # Always delete this before each commit
-    gmaps = googlemaps.Client(key=api_key)  # key should be kept secret on server
 
+    api_key = utils.get_key("GOOGLE_MAPS_API_KEY")
+    gmaps = googlemaps.Client(key=api_key)  # key should be kept secret on server
 
     # Geocoding an address
     # geocode_result = gmaps.geocode('1600 Amphitheatre Parkway, Mountain View, CA')
@@ -49,9 +50,7 @@ def google_planner(start, goal):
     https://github.com/googlemaps/google-maps-services-python/blob/master/googlemaps/directions.py
     https://googlemaps.github.io/google-maps-services-python/docs/index.html#googlemaps.Client.directions
     '''
-    # manual testing, this is a 1/2 mile distance
-    start = "Fuller Apartments, Institute Rd, Worcester, MA 01609"
-    goal = "Worcester Art Museum, 55 Salisbury St, Worcester, MA 01609"
+
     # call directions method, set parameter to walking, departure_time
     # returns list of routes
     directions_result = gmaps.directions(start,
@@ -61,10 +60,10 @@ def google_planner(start, goal):
                                          )
 
     # Validate an address with address validation
-    addressvalidation_result = gmaps.addressvalidation(['1600 Amphitheatre Pk'],
-                                                       regionCode='US',
-                                                       locality='Mountain View',
-                                                       enableUspsCass=True)
+    # addressvalidation_result = gmaps.addressvalidation(['1600 Amphitheatre Pk'],
+    #                                                    regionCode='US',
+    #                                                    locality='Mountain View',
+    #                                                    enableUspsCass=True)
 
     return directions_result  # can return json with fields for routes, and directions
 
@@ -94,4 +93,29 @@ def interpret_directions(route):
         # step_end_coor = route_step['end_location']          # example:  "end_location": { "lat": 41.8769003, "lng": -87.6297353 },
         # pile coordinates into stack
         path_coord_list.put(robot_waypoint)
+
+def latlong2string(latlong: tuple[float, float]) -> str:
+    """
+    Converts latitude longitude tuple to string for googlemaps search
+    :param latlong: tuple
+    :return: str
+    """
+    latitude, longitude = latlong
+    return str(latitude) + ", " + str(longitude)
+
+
+def extract_waypoints(route) -> list[tuple[float, float]]:
+    """
+    Takes in route from googlemaps and parses to waypoints
+    Note: waypoints here are the end_locations for each step
+    :param route: route from googlemaps routes
+    :return: list of waypoints
+    """
+    legs = [route_step['legs'] for route_step in route][0][0]
+    steps = legs['steps']
+    end_locations = [step['end_location'] for step in steps]
+
+    waypoints = [(end_location['lat'], end_location['lng']) for end_location in end_locations]
+
+    return waypoints
 

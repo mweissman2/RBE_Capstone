@@ -82,10 +82,13 @@ def transcribe_audio(client, audio_q):
     return result
 
 
-def run_audio(audio_q, transcription_q, keyword_path):
+def run_audio(queue_dict, keyword_path):
     """
   Main function that coordinates wakeword detection, recording, and transcription.
   """
+    audio_q = queue_dict['audio']
+    transcription_q = queue_dict['transcription']
+
     # Setup
     try:
         start = time.perf_counter()

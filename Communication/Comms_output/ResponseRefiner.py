@@ -6,11 +6,12 @@ from Communication.Comms_output.Text_to_speech import tts_via_request
 from Communication.Comms_output.ImageCaptioner import get_image, describe_image, few_shot_describe_image
 
 
-def response_subscriber(response_q):
+def response_subscriber(queue_dict: dict[str, Queue]):
     """
     Pulls any desired responses from the queue and sends to response refiner and text to speech
     """
     print("Response Subscriber Started!")
+    response_q = queue_dict['response']
     while True:
         try:
             # Pull audio from queue

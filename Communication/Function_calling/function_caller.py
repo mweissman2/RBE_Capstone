@@ -129,7 +129,6 @@ def global_nav(start, response, response_call, queue_dict, simMode):
         temp_dict = {'set_destination': top_place['location']}
         queue_dict['flag'].put(temp_dict)
 
-    # *** Instead of printing, pass to global nav ***
     print(f"TOP PLACE: {top_place['displayName']['text']} \n"
           f"{top_place['formattedAddress']} \n"
           f"{top_place['location']}")

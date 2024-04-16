@@ -2,6 +2,7 @@ from elevenlabs.client import ElevenLabs
 from elevenlabs import play
 from Communication import utils
 import requests
+import time
 
 
 def setup():
@@ -31,6 +32,7 @@ def tts_via_request(text_to_play: str):
     Makes direct POST request to ElevenLabs and plays response Audio
     Current Voice: Rachel
     """
+    start = time.perf_counter()
     API_KEY, client = setup()
 
     url = "https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM"
@@ -51,6 +53,11 @@ def tts_via_request(text_to_play: str):
 
     # Make request and play response
     response = requests.post(url, json=data, headers=headers, params=querystring)
+
+    end = time.perf_counter()
+    elapsed_time = end - start
+    print(f"%%%TTS execution time: {elapsed_time} seconds")
+
     play(response.content)
 
 # Samples

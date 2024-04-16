@@ -4,7 +4,7 @@ from occupancy_map import *
 from apf_planner import *
 import matplotlib.path as mplpath
 import matplotlib.pyplot as plt
-
+import time
 
 if __name__ == "__main__":
 
@@ -29,14 +29,14 @@ if __name__ == "__main__":
     cone_vertices_list = []
     vo_path_list = []
 
-
+    nav_start_time = time.time()
     vo_algo = velocityObstacle()
-
-    o_map = OccupancyMap(100,100)
+    o_map = OccupancyMap(100,100)       # this is where the occupancy map would go in
     # o_map.test_grid()    # create test grid
-    
-    # add computational time data
-    vo_algo.update_obstacles(obstacles)
+
+    inflate_radius = 3
+
+    vo_algo.update_obstacles(obstacles,inflate_radius)         # also add argument for the radius of the obstacles
     for i in range(len(obstacles)):
         current_cone_vertices = vo_algo.vo_calculation(o_map.occupancy_grid, robot_pos, o_velocity[i], robot_velocity)
         cone_vertices_list.append(current_cone_vertices)
@@ -44,8 +44,8 @@ if __name__ == "__main__":
 
 
     # Extract x and y coordinates from cone_vertices
-    x_coords = [vertex[0] for vertex in cone_vertices_list]
-    y_coords = [vertex[1] for vertex in cone_vertices_list]
+    # x_coords = [vertex[0] for vertex in cone_vertices_list]
+    # y_coords = [vertex[1] for vertex in cone_vertices_list]
 
 
     o_map.discretize_grid(vo_path_list)           # extract mesh of velocity obstacles
@@ -53,14 +53,41 @@ if __name__ == "__main__":
     # APF section
 
     local_start = [10, -20]
-    local_goal = [0, 10]
+    local_goal = [10, 15]
     grid_size = [50, 50]
-
+    distance_tolerance = 1.9
     local_planner = APF_Planner(local_start, local_goal, grid_size)
 
     local_planner.repulsive_force(obstacle_coord)       # pass in obstacle coordinates to APF
     local_planner.attractive_force()            # currently has issue with distance calculation
     local_planner.plot_field(obstacle_coord)
+    local_path = local_planner.path_finder(distance_tolerance)                 # find the path and
+    x_path = [coord[0] for coord in local_path]
+    y_path = [coord[1] for coord in local_path]
+    plt.plot(x_path, y_path, linestyle='-', color='b', label='Coordinates')
+    print(local_path)
+    nav_end_time = time.time()
+    result_time = nav_end_time - nav_start_time
+
+
+    # saving data
+    # File path
+    file_path = "apf_vo_time_data.txt"
+
+    # Open the file in append mode (create if not exist)
+    with open(file_path, 'a+') as file:
+        # Move the cursor to the start of the file
+        file.seek(0)
+        # Check if the file is empty
+        if not file.read():
+            # If the file is empty, write the variable's value to the file
+            file.write(f'{nav_start_time},{result_time}')
+        else:
+            # If the file is not empty, move the cursor to the end of the file and add a new line before writing
+            file.seek(0, 2)
+            file.write('\n' + f'{nav_start_time},{result_time}')
+
+
     # Plot the points
     # plt.figure()
     # plt.plot(x_coords, y_coords, 'ro')  # 'ro' specifies red circles for points

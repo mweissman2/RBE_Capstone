@@ -136,8 +136,8 @@ while robot.step(timestep) != -1:
 
     #code block for sending one waypoint and moving the robot
     if first:
-        my_controller.set_current_position(robot_location)
-        my_controller.new_plan_trajectory([robot_location[0]-5,robot_location[1]-1,-0.5],8, curr_time)
+        my_controller.set_current_position(robot_location, True)
+        my_controller.new_plan_trajectory([robot_location[0]-3,robot_location[1]-1,0],8, curr_time)
         first = False
 
     done_flag = my_controller.move(curr_time, robot_location)

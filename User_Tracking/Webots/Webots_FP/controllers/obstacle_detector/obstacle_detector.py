@@ -45,6 +45,8 @@ class ObstacleDetector:
                 data = self.camera_objects[id]
                 prev_position = data[1]
                 new_position = self.transform_camera_object_position(objects.getPosition())
+                new_size = objects.getSize()[0]
+                data[2] = new_size
                 data[3] = self.calc_velocity(prev_position, new_position)
                 #make new data for dict and update #TODO
                 self.camera_objects.update({id: data})
@@ -54,7 +56,7 @@ class ObstacleDetector:
                     id = objects.getId()
                     position = objects.getPosition()
                     transformed_position = self.transform_camera_object_position(position) #add robot position into this as well.
-                    size = objects.getSize()  # adjust based on size on image? #TODO
+                    size = objects.getSize()[0]  #returns width of object in the camera frame
                     velocity = [0,0,0]
                     description = objects.getModel()
                     relative_location = self.get_relative_location(objects,self.camera_location)

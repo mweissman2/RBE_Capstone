@@ -32,7 +32,7 @@ user_id = user_node.getId()
 #logging data from file
 csv_file = open(cwd + '\\User_Tracking_Data.csv', 'w', newline='')
 csv_writer = csv.writer(csv_file)
-header = ['Actual X Pos', 'Actual Y Pos', 'Measured X Pos', 'Measured Y Pos', 'Timestep', 'Out_of_range']
+header = ['Actual X Pos', 'Actual Y Pos', 'Measured X Pos', 'Measured Y Pos', 'Timestep', 'Out_of_range', 'Tracking_flag']
 csv_writer.writerow(header)
 
 #enable keboard for exiting program and controlling
@@ -144,7 +144,7 @@ while robot.step(timestep) != -1:
 
 
     if i == 3:
-        measured_position, user_out_of_range = user_tracker.run()
+        measured_position, user_out_of_range, tracking_flag = user_tracker.run()
         #print(measured_position)
         # log data
         # get measured data
@@ -165,7 +165,7 @@ while robot.step(timestep) != -1:
         act_x_pos = str(user_position[0])
         act_y_pos = str(user_position[1])
 
-        line = [act_x_pos,act_y_pos, meas_x_pos, meas_y_pos, curr_time, user_out_of_range]
+        line = [act_x_pos,act_y_pos, meas_x_pos, meas_y_pos, curr_time, float(user_out_of_range), float(tracking_flag)]
         csv_writer.writerow(line)
 
         i = 0

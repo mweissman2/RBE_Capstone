@@ -40,8 +40,8 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation -0.10903450729884903 0.8654796139440076 0.4889340590155573 0.9634340988592002
-  position -7.8376984770240465 -4.396290626131599 12.572462254955155
+  orientation -0.05116749409684544 0.801890852689732 0.5952755226954856 0.7462688379348943
+  position -17.973733376898124 -8.94821120753949 15.199524689564479
 }
 TexturedBackground {
 }
@@ -69,7 +69,6 @@ Solid {
   boundingObject USE BALL_GEOMETRY
   physics Physics {
   }
-  linearVelocity 0 0 3.024243306251971e-05
 }
 DEF DOG Robot {
   translation -0.687690566117882 -0.4894532450682161 0.2752060355275611
@@ -182,8 +181,6 @@ DEF DOG Robot {
             boundingObject USE Wheel_size
             physics Physics {
             }
-            linearVelocity -0.3579483039786828 -0.2277387340353882 5.459980048659106e-06
-            angularVelocity 1.8438730994555832 -2.762114242834866 -0.09934159024758565
           }
         }
         HingeJoint {
@@ -201,7 +198,7 @@ DEF DOG Robot {
           ]
           endPoint Solid {
             translation 0.20000000000000004 0.19999999999999996 -0.15
-            rotation -0.012049168946847558 -0.7070542592022822 0.7070566399317681 3.1656897442366048
+            rotation -0.012049168946847554 -0.7070542592022824 0.7070566399317679 3.1656897442366048
             children [
               USE Wheel
             ]
@@ -210,8 +207,6 @@ DEF DOG Robot {
             boundingObject USE Wheel_size
             physics Physics {
             }
-            linearVelocity -0.3256678514895304 -0.20616567138845107 5.467183109203503e-06
-            angularVelocity 1.7504197034698652 -2.622272779448305 -0.09916076226865089
           }
         }
         HingeJoint {
@@ -229,7 +224,7 @@ DEF DOG Robot {
           ]
           endPoint Solid {
             translation -0.20000000000000004 -0.19999999999999996 -0.15000000000000008
-            rotation -0.47749463546624826 -0.6212874832556139 0.6212895751989246 4.032553567693672
+            rotation -0.47749463546624826 -0.6212874832556139 0.6212895751989244 4.032553567693672
             children [
               USE Wheel
             ]
@@ -238,8 +233,6 @@ DEF DOG Robot {
             boundingObject USE Wheel_size
             physics Physics {
             }
-            linearVelocity -0.37945824376562953 -0.1954127322580091 -5.464501861507837e-06
-            angularVelocity 2.099558014570705 -3.1446133805944894 -0.09983801941503362
           }
         }
         HingeJoint {
@@ -257,7 +250,7 @@ DEF DOG Robot {
           ]
           endPoint Solid {
             translation -0.20000000000000004 0.19999999999999996 -0.15
-            rotation 0.02772950796712686 -0.706833682655464 0.7068360626422618 3.08614803231294
+            rotation 0.02772950796712687 -0.706833682655464 0.7068360626422618 3.08614803231294
             children [
               USE Wheel
             ]
@@ -266,8 +259,6 @@ DEF DOG Robot {
             boundingObject USE Wheel_size
             physics Physics {
             }
-            linearVelocity -0.34717946562984364 -0.173837067272225 -5.457272365756118e-06
-            angularVelocity 1.494817658974265 -2.239693992259136 -0.09870597490003628
           }
         }
         HingeJoint {
@@ -285,7 +276,7 @@ DEF DOG Robot {
           ]
           endPoint Solid {
             translation -0.12 0 0.2
-            rotation -2.346353326862037e-06 -2.2187686638459443e-06 0.9999999999947858 4.656508124994795
+            rotation -2.3463533268620364e-06 -2.218768663845944e-06 0.9999999999947858 4.656508124994795
             children [
               HingeJoint {
                 jointParameters HingeJointParameters {
@@ -304,7 +295,7 @@ DEF DOG Robot {
                 ]
                 endPoint Solid {
                   translation 0 0 0.08
-                  rotation 0.9961061690481515 -0.06233968011719538 0.062339909104047075 1.5747014217232214
+                  rotation 0.9961061690481515 -0.06233968011719537 0.06233990910404708 1.5747014217232214
                   children [
                     Solid {
                       rotation -0.9999999999999999 0 0 1.5707953071795862
@@ -389,8 +380,6 @@ DEF DOG Robot {
   }
   controller "<extern>"
   supervisor TRUE
-  linearVelocity -0.3525688390112708 -0.20079209540350915 7.68924787798536e-10
-  angularVelocity 1.82620673799009e-05 -2.7239898431511517e-05 -0.09706697972081293
 }
 Robot {
   translation 0.1 0 0.1

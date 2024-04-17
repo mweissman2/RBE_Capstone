@@ -31,14 +31,17 @@ class Gimbal_Controller:
         #saves state of last main direction to rotate that way if person is lost.
         self.last_direction = 1 #positive 1 for positive rotation, -1 for negative rotation
         self.user_in_frame = False
+        self.tracking_flag = False
+        self.use_estimator = False
         #self.center_error_margin = 0.06 #50 pixels?
-        self.center_error_margin = 0.3
+        self.center_error_margin = 0.2
         self.max_distance = 3 #max distance the user is allowed to be from the robot
 
         self.x_velocity_buffer = [0,0,0,0,0]
         self.y_velocity_buffer = [0,0,0,0,0]
         self.velocity_buffer_index = 0
         self.prev_position = [-2,0]
+        self.estimated_position = [0,0]
         self.next_position = [0,0]
         self.prev_velocity = [0,0]
 
@@ -82,9 +85,11 @@ class Gimbal_Controller:
             self.last_direction = 1
         #if within an error threshold for image centering, #then calculate depth and angle
         if np.abs(xn_setpoint-x_input) < self.center_error_margin:
-            user_location = self.get_user_location(good_frame,[x_input,y_input])
+            user_location = self.get_user_location(good_frame,[x_input, y_input])
         else:
             user_location = self.estimate_next_position(self.prev_position, self.prev_velocity)
+
+
 
 
     #calculates the depth and angle and calculates the user position
@@ -98,6 +103,8 @@ class Gimbal_Controller:
         #update velocity estimator
         curr_velocity = self.interpolate_velocity(curr_position)
         #update state estimator
+        self.estimated_position = (np.array(self.prev_position) + np.array(self.next_position)) / 2.0
+
         self.estimate_next_position(curr_position,curr_velocity)
 
         return (curr_position, curr_velocity)
@@ -114,6 +121,7 @@ class Gimbal_Controller:
             if obj.getId() == self.user_id:
                 #if they are found then set boolean to true
                 self.user_in_frame = True
+                self.tracking_flag = True
                 position = obj.getPosition()
                 position_on_image = obj.getPositionOnImage()
                 #TODO maybe change to just sending the image, or the segmentation?
@@ -126,6 +134,7 @@ class Gimbal_Controller:
         else:
             #else do continuous rotation in the same as the previous direction to find user
             #calculate new angle and set
+            self.tracking_flag = False
             new_angle = self.current_yaw_axis_angle + (self.last_direction*0.35)
             self.yaw_axis_motor.setPosition(new_angle)
 
@@ -191,7 +200,6 @@ class Gimbal_Controller:
         self.current_pitch_axis_angle = self.pitch_axis_motor.getPositionSensor().getValue()
 
     def calculate_user_position(self, depth, angle):
-
         x_pos = depth*math.cos(angle) #pi is added to align gimbal frame to robot frame
         y_pos = depth*math.sin(angle)
 
@@ -199,7 +207,7 @@ class Gimbal_Controller:
 
     def interpolate_velocity(self, curr_position):
         #calculate current velocity
-        curr_x_velocity = (curr_position[0] - self.prev_position[0])/(self.update_time/1000)
+        curr_x_velocity = (curr_position[0] - self.prev_position[0]) / (self.update_time/1000)
         curr_y_velocity = (curr_position[1] - self.prev_position[1]) / (self.update_time/1000)
 
         self.prev_position = curr_position
@@ -227,7 +235,7 @@ class Gimbal_Controller:
 
         self.next_position = [next_x_pos, next_y_pos]
 
-        return (next_x_pos, next_y_pos)
+        return [next_x_pos, next_y_pos]
 
     #setter function for enabling segmentation (needs to also be set in webot world)
     def enable_segmentation(self, status):
@@ -267,10 +275,12 @@ class Gimbal_Controller:
     def run(self):
         out_of_range_flag = False
         self.find_user()
+        if self.use_estimator:
+            self.prev_position = self.estimated_position
         distance = np.sqrt(self.prev_position[0]**2 + self.prev_position[1]**2)
         if distance > self.max_distance:
             out_of_range_flag = True
-        return self.prev_position, out_of_range_flag
+        return self.prev_position, out_of_range_flag, self.tracking_flag
 
     def calculate_user_position_new(self, depth, angle, user_position_on_image):
         #calculates the distance from left to right given the current depth measurement

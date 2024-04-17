@@ -18,8 +18,10 @@ y_pos_actual = []
 time_actual = []
 x_pos_measured = []
 y_pos_measured = []
+tracking = []
+out_of_range = []
 
-#header = ['Actual X Pos', 'Actual Y Pos', 'Measured X Pos', 'Measured Y Pos', 'Timestep' 'Out_of_range']
+#header = ['Actual X Pos', 'Actual Y Pos', 'Measured X Pos', 'Measured Y Pos', 'Timestep' 'Out_of_range', 'Tracking Flag']
 
 names = csv_reader.fieldnames
 print(names)
@@ -31,6 +33,9 @@ for row in csv_reader:
     time_actual.append(float(row['Timestep']))
     x_pos_measured.append(float(row['Measured X Pos']))
     y_pos_measured.append(float(row['Measured Y Pos']))
+    tracking.append(float(row['Tracking_flag']))
+    out_of_range.append(float(row['Out_of_range']))
+
 
 #convert to np arrays
 x_pos_measured = np.array(x_pos_measured)
@@ -53,7 +58,8 @@ ax1.set_ylabel("error (m)")
 ax1.set_title("Position Estimation X Error vs Time")
 ax2.plot(time_actual, x_pos_measured)
 ax2.plot(time_actual, x_pos_actual)
-ax2.legend(["Measured Position", "Actual Position"])
+ax2.plot(time_actual, tracking)
+ax2.legend(["Measured Position", "Actual Position", "Tracking Flag"])
 ax2.set_xlabel("Simulation Time")
 ax2.set_ylabel("X Position (Meters)")
 ax2.set_title("X position measurements vs time")
@@ -66,9 +72,10 @@ ax1.set_ylabel("error (m)")
 ax1.set_title("Position Estimation Y Error vs Time")
 ax2.plot(time_actual, y_pos_measured)
 ax2.plot(time_actual, y_pos_actual)
+ax2.plot(time_actual, tracking)
 ax2.set_xlabel("Simulation Time")
 ax2.set_ylabel("Y Position (Meters)")
-ax2.legend(["Measured Position", "Actual Position"])
+ax2.legend(["Measured Position", "Actual Position", "Tracking Flag"])
 ax2.set_title("Y position measurements vs time")
 plt.show()
 

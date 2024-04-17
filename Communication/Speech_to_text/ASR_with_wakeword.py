@@ -4,8 +4,7 @@ from Communication import utils
 import struct
 import speech_recognition as sr
 from openai import OpenAI
-import queue
-import datetime
+from multiprocessing import Queue
 import io
 
 
@@ -76,7 +75,7 @@ class AudioTranscriber:
                         transcription = self.transcriber()
                     except KeyboardInterrupt:
                         break
-                    except queue.Empty:
+                    except Queue.queue.empty:
                         print("TIME OUT: No input detected")
                         break
 
@@ -91,14 +90,6 @@ class AudioTranscriber:
         """
         # Pull audio from queue
         audio_data = self.audio_in_queue.get(block=True, timeout=5)
-
-        now = datetime.datetime.now(datetime.UTC)
-        phrase_complete = False
-        # If enough time has passed between recordings, consider the phrase complete.
-        if self.phrase_time and now - self.phrase_time > datetime.timedelta(seconds=2):
-            phrase_complete = True
-        # This is the last time we received new audio data from the queue.
-        self.phrase_time = now
 
         # Convert audio data to WAV format and name (this is important for openAI call to work)
         buffer = io.BytesIO(audio_data.get_wav_data())

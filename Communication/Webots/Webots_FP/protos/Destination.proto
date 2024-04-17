@@ -1,0 +1,50 @@
+#VRML_SIM R2023b utf8
+# license: Copyright Cyberbotics Ltd. Licensed for use only with Webots.
+# license url: https://cyberbotics.com/webots_assets_license
+# documentation url: https://webots.cloud/run?url=https://github.com/cyberbotics/webots/blob/released/projects/objects/shapes/protos/TexturedBoxShape.proto
+# keywords: primitive/geometry
+# Box with customizable texture mapping on selected faces.
+# If the boolean value associated with a face (`frontFace`, `leftFace`, etc.) is FALSE, then the uniform color specified in `faceColor` field will be applied instead of the texture.
+# This is an extension of the TexturedBox geometry PROTO.
+# Available texture mappings:
+# - `cube` mapping: see texture at projects/samples/geometries/worlds/textures/cube_mapping.jpg
+# - `compact` cube mapping: see texture at projects/samples/geometries/worlds/textures/compact_mapping.jpg
+# - `flat` mapping: projecting the texture on the front face.
+# - `metric` mapping: similar to default mapping but the texture is not deformed to match each face size.
+# - `default` mapping: same texture on all the faces.
+#
+# A demo of these mappings is available in projects/samples/geometries/worlds/textured_boxes.wbt.
+# template language: javascript
+
+
+PROTO Destination [
+    field SFVec3f translation 0 0 0
+    field SFRotation rotation 0 0 1 0
+    unconnectedField SFString name "destination"
+]
+{
+    Solid {
+    translation IS translation
+    rotation IS rotation
+    children [
+        Shape {
+            appearance Appearance {
+                material Material {
+                    ambientIntensity 0.2
+                    diffuseColor 1 0 0
+                    emissiveColor 0 0 0
+                    shininess 0.2
+                    specularColor 0 0 0
+                    transparency 0.2
+                }
+            }
+            geometry Cylinder {
+                height 100
+                radius 10
+            }
+        }
+
+    ]
+
+    }
+}

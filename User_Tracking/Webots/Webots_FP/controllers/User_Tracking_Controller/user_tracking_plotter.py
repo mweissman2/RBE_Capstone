@@ -19,13 +19,13 @@ time_actual = []
 x_pos_measured = []
 y_pos_measured = []
 
-header = ['Actual X Pos', 'Actual Y Pos', 'Timestep', 'Measured X Pos', 'Measured Y Pos', 'Timestep']
+#header = ['Actual X Pos', 'Actual Y Pos', 'Measured X Pos', 'Measured Y Pos', 'Timestep' 'Out_of_range']
 
 names = csv_reader.fieldnames
 print(names)
 
 for row in csv_reader:
-    print(row)
+    #print(row)
     x_pos_actual.append(float(row['Actual X Pos']))
     y_pos_actual.append(float(row['Actual Y Pos']))
     time_actual.append(float(row['Timestep']))
@@ -39,31 +39,37 @@ time = np.array(time_actual)
 x_pos_actual = np.array(x_pos_actual)
 y_pos_actual = np.array(y_pos_actual)
 
-x_error = np.divide(x_pos_measured-x_pos_actual, x_pos_actual) * 100
-y_error = np.divide(y_pos_measured-y_pos_actual, y_pos_actual) * 100
+x_error = x_pos_measured-x_pos_actual
+x_zero_mean = x_error - np.mean(x_error)
+y_error = y_pos_measured-y_pos_actual
+y_zero_mean = y_error - np.mean(y_error)
 
-plt.plot(time_actual, x_error)
-plt.plot(time_actual, y_error)
-plt.xlabel("Simulation Time")
-plt.ylabel("error (%)")
-plt.legend(["X Error", "Y Error"])
-plt.title("Position Estimation Error vs Time")
+#plotting
+fig, (ax1, ax2) = plt.subplots(2,1)
+
+ax1.plot(time_actual, x_zero_mean)
+ax1.set_xlabel("Simulation Time")
+ax1.set_ylabel("error (m)")
+ax1.set_title("Position Estimation X Error vs Time")
+ax2.plot(time_actual, x_pos_measured)
+ax2.plot(time_actual, x_pos_actual)
+ax2.legend(["Measured Position", "Actual Position"])
+ax2.set_xlabel("Simulation Time")
+ax2.set_ylabel("X Position (Meters)")
+ax2.set_title("X position measurements vs time")
 plt.show()
 
-plt.plot(time_actual, x_pos_measured)
-plt.plot(time_actual, x_pos_actual)
-plt.legend(["Measured Position", "Actual Position"])
-plt.xlabel("Simulation Time")
-plt.ylabel("X Position (Meters)")
-plt.title("X position measurements vs time")
-plt.show()
-
-plt.plot(time_actual, y_pos_measured)
-plt.plot(time_actual, y_pos_actual)
-plt.xlabel("Simulation Time")
-plt.ylabel("Y Position (Meters)")
-plt.legend(["Measured Position", "Actual Position"])
-plt.title("Y position measurements vs time")
+fig, (ax1, ax2) = plt.subplots(2,1)
+ax1.plot(time_actual, y_zero_mean)
+ax1.set_xlabel("Simulation Time")
+ax1.set_ylabel("error (m)")
+ax1.set_title("Position Estimation Y Error vs Time")
+ax2.plot(time_actual, y_pos_measured)
+ax2.plot(time_actual, y_pos_actual)
+ax2.set_xlabel("Simulation Time")
+ax2.set_ylabel("Y Position (Meters)")
+ax2.legend(["Measured Position", "Actual Position"])
+ax2.set_title("Y position measurements vs time")
 plt.show()
 
 

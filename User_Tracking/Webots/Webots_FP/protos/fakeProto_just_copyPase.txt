@@ -1,22 +1,7 @@
-#VRML_SIM R2023b utf8
-# Ths is a proto for our robot for the final project
-# template language: javascript
-
-
-PROTO SeeingEyeRobot [
-  field SFVec3f translation 0 0 0
-  field SFRotation rotation 0 0 1 0
-  field SFFloat bodyMass 1
-  field SFString name "robot"
-  field SFString controller "<generic>"
-]
-{
- Robot {
-   translation IS translation
-   rotation IS rotation
-   name IS name
-   controller IS controller
-   children [
+DEF DOG Robot {
+  translation -3.84707 -1.11332 0.274719
+  rotation 0.9999999999978882 -8.809169583550814e-07 -1.8567763935675413e-06 2.4613368446326262e-08
+  children [
     DEF ROBOT_BASE Solid {
       translation 0 0 -0.0016935350243008074
       children [
@@ -322,7 +307,3 @@ PROTO SeeingEyeRobot [
   controller "<extern>"
   supervisor TRUE
 }
-}
-
-
-

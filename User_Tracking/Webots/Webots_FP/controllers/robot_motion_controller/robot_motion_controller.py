@@ -3,7 +3,7 @@
 # You may need to import some classes of the controller module. Ex:
 #  from controller import Robot, Motor, DistanceSensor
 from controller import Robot
-import motion_controller  as MC
+import Motion_Controller as MC
 from controller import Keyboard
 
 # create the Robot instance.
@@ -34,13 +34,14 @@ vx = 0
 vy = 0
 wz = 0
 #create the reference to motion controller
-my_controller = MC.MotionController(wheels[0],wheels[1],wheels[2],wheels[3], GPS, heading)
+my_controller = MC.Motion_Controller(wheels[0],wheels[1],wheels[2],wheels[3], GPS, heading)
 
 first = True
 # Main loop:
 iterations = 0
 # - perform simulation steps until Webots is stopping the controller
 while robot.step(timestep*3) != -1:
+    curr_time = robot.getTime()
     # Read the sensors:
     # Enter here functions to read sensor data, like:
     #  val = ds.getValue()
@@ -62,19 +63,29 @@ while robot.step(timestep*3) != -1:
     #print(vels)
     #my_controller.set_velocity(vx,vy,wz)
 
+
     if first:
-        #next_point = input("What is the desired point")
-        my_controller.plan_trajectory([2,4,0.36], [0.25,0.25,0], 10)
+        my_controller.set_current_position()
+        my_controller.new_plan_trajectory([3,5,-0.5],8, curr_time)
         first = False
 
-    done_flag = my_controller.send_next_step(0.5)
+    done_flag = my_controller.move(curr_time)
     if done_flag == False:
-        my_controller.plan_trajectory([0,0,0], [0.25,0.25,0], 10)
+        print("Robot")
 
-    iterations += 1
-    if iterations >= 10:
-        iterations = 0
-        my_controller.plot()
+    #if first:
+    #    next_point = input("What is the desired point")
+    #    my_controller.plan_trajectory([2,4,0.36], [0.25,0.25,0], 10)
+    #    first = False
+
+    #done_flag = my_controller.send_next_step(0.5)
+    #if done_flag == False:
+    #    my_controller.plan_trajectory([0,0,0], [0.25,0.25,0], 10)
+
+    #iterations += 1
+    #if iterations >= 10:
+    #    iterations = 0
+    #    my_controller.plot()
 
     # Process sensor data here.
 

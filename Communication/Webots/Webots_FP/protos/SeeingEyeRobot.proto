@@ -16,13 +16,10 @@ PROTO SeeingEyeRobot [
    rotation IS rotation
    name IS name
    controller IS controller
-   children [
+    children [
     DEF ROBOT_BASE Solid {
       translation 0 0 -0.0016935350243008074
       children [
-        InertialUnit {
-          name "imu"
-        }
         Solid {
           translation 0.28 0 -0.00999987
           rotation 0 1 0 -1.5707953071795862
@@ -45,8 +42,8 @@ PROTO SeeingEyeRobot [
           name "Front_Lidar_Solid"
         }
         Solid {
-          translation 0.28 0 0.1
-          rotation 0.7071072811865696 -3.3905013482585576e-09 0.7071062811861719 3.14159
+          translation 0.29 0 0.08
+          rotation 0 1 0 -1.5707953071795862
           children [
             Shape {
               appearance MattePaint {
@@ -58,18 +55,9 @@ PROTO SeeingEyeRobot [
               }
             }
             Camera {
-              translation 2.12131e-07 9.4058e-08 0.025
-              rotation -0.707108281185553 -3.3905013482517768e-09 -0.70710528118436 -3.1415853071795863
+              translation 0 0 -0.025
+              rotation 0 1 0 1.5708
               name "front_camera"
-              fieldOfView 1.52
-              width 858
-              height 480
-              recognition Recognition {
-                maxRange 20
-                frameColor 0.109804 0.909804 1
-                frameThickness 3
-                segmentation TRUE
-              }
             }
           ]
           name "Front_Camera_Solid"
@@ -77,8 +65,6 @@ PROTO SeeingEyeRobot [
         Solid {
           translation 0 0 0.15
           children [
-            Speaker {
-            }
             Shape {
               appearance MattePaint {
                 baseColor 0 0.333333 0
@@ -94,20 +80,18 @@ PROTO SeeingEyeRobot [
         }
         HingeJoint {
           jointParameters HingeJointParameters {
-            position -9.998336398221554
             axis 0 1 0
             anchor 0.2 -0.2 -0.15
           }
           device [
             RotationalMotor {
-              name "front_right_wheel"
             }
             PositionSensor {
             }
           ]
           endPoint Solid {
-            translation 0.20000000000000007 -0.19999999999999996 -0.14999999999999994
-            rotation 0.2041408190692902 0.692215031332125 -0.6922173620963176 2.7388461180731207
+            translation 0.2 -0.2 -0.15
+            rotation 1 -1.0370632309154904e-11 1.0370807250451913e-11 1.5707996938995423
             children [
               DEF Wheel Shape {
                 appearance MattePaint {
@@ -115,7 +99,7 @@ PROTO SeeingEyeRobot [
                 }
                 geometry DEF Wheel_size Cylinder {
                   height 0.05
-                  radius 0.125
+                  radius 0.08
                 }
               }
             ]
@@ -128,20 +112,18 @@ PROTO SeeingEyeRobot [
         }
         HingeJoint {
           jointParameters HingeJointParameters {
-            position 15.959012051842866
             axis 0 1 0
             anchor 0.2 0.2 -0.15
           }
           device [
             RotationalMotor {
-              name "front_left_wheel"
             }
             PositionSensor {
             }
           ]
           endPoint Solid {
-            translation 0.20000000000000004 0.19999999999999996 -0.15
-            rotation -0.0888753319834993 0.7043074026505156 -0.7043097741310335 3.3188769222212597
+            translation 0.2 0.2 -0.15
+            rotation 1 -1.0372312618623644e-11 1.0372170329234128e-11 1.5707996938995434
             children [
               USE Wheel
             ]
@@ -154,20 +136,18 @@ PROTO SeeingEyeRobot [
         }
         HingeJoint {
           jointParameters HingeJointParameters {
-            position 15.9649162498344
             axis 0 1 0
             anchor -0.2 -0.2 -0.15
           }
           device [
             RotationalMotor {
-              name "back_right_wheel"
             }
             PositionSensor {
             }
           ]
           endPoint Solid {
-            translation -0.2000000000000001 -0.19999999999999996 -0.14999999999999997
-            rotation -0.09097113920921597 0.7041735981247564 -0.7041759691547359 3.323034899128199
+            translation -0.2 -0.2 -0.15
+            rotation 1 -1.0371633799625908e-11 1.0371747160129742e-11 1.5707996938995388
             children [
               USE Wheel
             ]
@@ -180,20 +160,18 @@ PROTO SeeingEyeRobot [
         }
         HingeJoint {
           jointParameters HingeJointParameters {
-            position -10.0014742256525
             axis 0 1 0
             anchor -0.2 0.2 -0.15
           }
           device [
             RotationalMotor {
-              name "back_left_wheel"
             }
             PositionSensor {
             }
           ]
           endPoint Solid {
-            translation -0.20000000000000004 0.19999999999999996 -0.15000000000000002
-            rotation 0.2052722213567602 0.6920477186991835 -0.6920500489000179 2.7366743289975277
+            translation -0.2 0.2 -0.15
+            rotation 1 -1.0372160841997104e-11 1.037223112421577e-11 1.5707996938995399
             children [
               USE Wheel
             ]
@@ -239,31 +217,26 @@ PROTO SeeingEyeRobot [
                   rotation 1 0 0 1.5707999999999998
                   children [
                     Solid {
-                      rotation -0.9999999999999999 0 0 1.5707953071795862
+                      rotation 1 0 0 -1.5707953071795862
                       children [
                         Camera {
-                          translation 0.034 0 0
+                          translation -0.036 0 0
+                          rotation 0 0 1 3.141592653589793
                           name "RGB_camera"
                           recognitionColors [
                             0 0 0
                           ]
-                          fieldOfView 1.518
-                          width 640
-                          height 480
-                          noise 0.01
                           recognition Recognition {
-                            segmentation TRUE
                           }
                         }
                         RangeFinder {
-                          translation 0.034 0 0
+                          translation -0.035 0 0
+                          rotation 0 0 1 3.141592653589793
                           name "range_finder"
-                          fieldOfView 1.52
                           width 640
                           height 480
-                          minRange 0.06
-                          maxRange 6
-                          noise 0.05
+                          minRange 0.02
+                          maxRange 4
                         }
                         Shape {
                           appearance MattePaint {
@@ -314,13 +287,12 @@ PROTO SeeingEyeRobot [
       name "Gimbal"
       boundingObject USE BASE
       physics Physics {
+      density -1
+      mass IS bodyMass
       }
     }
   ]
-  physics Physics {
-  }
-  controller "<extern>"
-  supervisor TRUE
+  controller IS controller
 }
 }
 

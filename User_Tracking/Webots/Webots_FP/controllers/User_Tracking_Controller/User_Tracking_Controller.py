@@ -65,7 +65,7 @@ i = 0
 while robot.step(timestep) != -1:
     # Read the sensors:
     if i == 3:
-        measured_position = tracker.run()
+        measured_position, tracking_flag = tracker.run()
         #print(measured_position)
         # log data
         # get measured data
@@ -79,7 +79,7 @@ while robot.step(timestep) != -1:
         act_x_pos = str(user_position[0])
         act_y_pos = str(user_position[1])
 
-        line = [act_x_pos,act_y_pos, curr_time, meas_x_pos, meas_y_pos, curr_time]
+        line = [act_x_pos, act_y_pos, curr_time, meas_x_pos, meas_y_pos, tracking_flag]
         csv_writer.writerow(line)
 
         i = 0

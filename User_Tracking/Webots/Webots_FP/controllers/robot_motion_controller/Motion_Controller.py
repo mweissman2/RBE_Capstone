@@ -7,7 +7,7 @@ matplotlib.use('TkAgg')
 
 data_len = 200
 
-class MotionController:
+class Motion_Controller:
     def __init__(self, wheel1, wheel2, wheel3, wheel4, localization, heading):
         self.inside_wheel_front = wheel1 #front left
         self.inside_wheel_back = wheel4 #back right
@@ -20,12 +20,14 @@ class MotionController:
         self.current_position = [0,0,0]
         self.current_velocity = [0,0,0]
         self.goal_position = [0,0,0]
-        self.error_epsilon = 0.05
-        self.heading_epsilon = 0.2
+        self.error_epsilon = 0.4
+        self.heading_epsilon = 0.3
         self.current_heading = 0
         self.wheel_radius = 0.125
         self.l_x = 0.2
         self.l_y = 0.2
+        self.curr_time = 0
+        self.goal_time = 0
 
         self.x_array = []
         self.y_array = []
@@ -41,8 +43,9 @@ class MotionController:
         self.z_positions = []
         self.trajectory_index = 0
         self.max_index = 0
+        self.turn_first = False #flag set if there is a big heading change, and the robot needs to turn first
 
-        self.fig, (self.ax1, self.ax2) = plt.subplots(2,1)
+        #self.fig, (self.ax1, self.ax2) = plt.subplots(2,1)
         #self.line, = self.ax.plot(list(range(0,200)), [0]*200)
 
         self.finished_flag = False
@@ -110,9 +113,6 @@ class MotionController:
     def get_current_position(self):
         return self.current_position
 
-    def set_current_position(self, new_position):
-        self.current_position = new_position
-
     def get_heading(self):
         return self.current_heading
 
@@ -122,13 +122,16 @@ class MotionController:
     def get_encoder_reading(self, wheel):
         return 0
 
-    def set_current_position(self):
-        pose = self.localization.getValues()
+    def set_current_position(self, robot_position, internal_check):
+        if internal_check:
+            pose = [robot_position[0], robot_position[1]]
+        else:
+            pose = self.localization.getValues()
         heading = self.heading.getRollPitchYaw()
         self.current_position = [pose[0], pose[1], heading[2]]
 
-    def send_next_step(self, velocity_goal):
-        self.set_current_position()
+    def send_next_step(self, velocity_goal, robot_position):
+        self.set_current_position(robot_position, True)
         if self.finished_flag == False:
             print(self.trajectory_index)
 
@@ -236,3 +239,81 @@ class MotionController:
             current_velocity = saturation
 
         return current_velocity
+
+    #calculates needed velocities to go to next point given
+    def new_plan_trajectory(self, goal_position, time, curr_time):
+        self.curr_time = curr_time
+        self.goal_time = curr_time+time
+
+        #transform world coordinate to robot frame.
+        angle = self.current_position[2]
+        x = self.current_position[0]
+        y = self.current_position[1]
+        tf_matrix = np.array([[np.cos(angle), np.sin(angle),0, -x*np.cos(angle)-y*np.sin(angle)],
+                              [-np.sin(angle), np.cos(angle),0, x*np.sin(angle)-y*np.cos(angle)],
+                              [0,0,-1,-np.cos(angle)],
+                              [0,0,0,1]])
+
+        res = np.matmul(tf_matrix, np.array([goal_position[0], goal_position[1],0,1]).reshape(4,1)).reshape(4)
+        x_delta = res[0]
+        y_delta = res[1]
+        heading_delta = goal_position[2] - self.current_position[2]
+        #heading_delta = 0
+        #x_delta = goal_position[0] - self.current_position[0]
+        #y_delta = goal_position[1] - self.current_position[1]
+
+        if abs(heading_delta) < 0.05:
+            angular_velocity = 0
+            velocities = np.array([x_delta/time, y_delta/time]).reshape(2,1)
+        else:
+            if heading_delta > np.pi:
+                heading_delta = heading_delta - 2*np.pi
+            elif heading_delta < -np.pi:
+                heading_delta = heading_delta + 2*np.pi
+
+            angular_velocity = heading_delta / time
+
+            m11 = (np.sin(angular_velocity*time))/angular_velocity
+            m12 = (np.cos(angular_velocity*time))/angular_velocity - (1/angular_velocity)
+            m21= -(np.cos(angular_velocity * time)) / angular_velocity + (1/angular_velocity)
+            m22 = (np.sin(angular_velocity*time))/angular_velocity
+
+
+            xm = x_delta
+            ym = y_delta
+
+            velocities = np.matmul(np.linalg.inv(np.array([[m11, m12],[m21, m22]])), np.array([xm, ym]).reshape(2,1))
+            #print(velocities)
+        self.goal_position = goal_position
+
+        self.x_vel_traj = velocities[0][0]
+        self.y_vel_traj = velocities[1][0]
+        self.z_vel_traj = angular_velocity
+
+    def move(self, curr_time, robot_position):
+        self.set_current_position(robot_position, True)
+        self.curr_time = curr_time
+        #print(self.current_position)
+
+        if not self.finished_flag :
+
+            if self.curr_time > self.goal_time+0.5:
+                print("missed the target")
+                if abs(self.current_position[0] - self.goal_position[0]) <= self.error_epsilon*5:
+                    if abs(self.current_position[1] - self.goal_position[1]) <= self.error_epsilon*5:
+                        print("Close to Goal")
+                        self.at_goal_position() #TODO
+                        return False
+
+            else:
+                if abs(self.current_position[0] - self.goal_position[0]) <= self.error_epsilon:
+                    if abs(self.current_position[1] - self.goal_position[1]) <= self.error_epsilon:
+                        if abs(self.current_position[2] - self.goal_position[2]) <= self.heading_epsilon:  # heading error is less important
+                            print("At Goal")
+                            self.at_goal_position()
+                            return False
+                else:
+                    self.set_velocity(self.x_vel_traj, self.y_vel_traj, self.z_vel_traj)
+
+            return True
+

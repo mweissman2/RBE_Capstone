@@ -7,6 +7,6 @@ centralWidgetVisible: 1
 orthographicViewHeight: 1
 textFiles: -1
 consoles: Console:All:All
-renderingDevicePerspectives: seeing_eye_robot:RGB_camera;1;1;0;0
+renderingDevicePerspectives: seeing_eye_robot:RGB_camera;0;0.51875;0;0
 renderingDevicePerspectives: seeing_eye_robot:front_camera;1;1;0;0
-renderingDevicePerspectives: seeing_eye_robot:range_finder;1;1;0;0
+renderingDevicePerspectives: seeing_eye_robot:range_finder;0;0.510417;0;0

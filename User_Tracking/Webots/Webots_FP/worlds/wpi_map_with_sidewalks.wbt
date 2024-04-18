@@ -46,13 +46,23 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation -0.19373583887079043 -0.16270476679047036 0.9674676137218702 4.611479294604049
-  position 369.11315177916987 62.44209730026848 3.6959632487747776
+  orientation 0.3768078688677688 -0.3931079477696696 -0.8387383211464998 4.52867374721753
+  position -19.712918407852555 -96.33307508004238 43.67122367156823
   near 3
 }
 TexturedBackground {
 }
 TexturedBackgroundLight {
+}
+DEF Ped_2 Pedestrian {
+  translation -20.99 -56.61 1.27
+  name "ped_2"
+  controller "robot_motion_controller"
+}
+DEF Ped_3 Pedestrian {
+  translation -15.99 -56.61 1.67
+  name "ped_3"
+  controller "robot_motion_controller"
 }
 Floor {
   translation 0 0 -0.02
@@ -8703,6 +8713,10 @@ Road {
     RoadLine {
       type "continuous"
     }
+  ]
+  roadBorderHeight 0
+  roadBorderWidth [
+    3
   ]
   wayPoints [
     0 0 0
@@ -20557,19 +20571,19 @@ DEF parking Pose {
   ]
 }
 Robot {
-  name "supervisor"
+  name "user_supervisor"
   controller "supervisor_controller_auto"
   supervisor TRUE
 }
 DEF USER Pedestrian {
-  translation 368.7997006230915 55.815810025964474 1.27
-  rotation 0 0 1 3.141592653589793
+  translation -15.3491 -60.7842 1.27
+  rotation 0 0 -1 -2.6179953071795863
   name "user"
   controller "<none>"
 }
 DEF DOG Robot {
-  translation 367.211 55.7067 0.255206
-  rotation -9.58979e-09 1.27237e-14 -1 -3.1415853071795863
+  translation -17.06040000082393 -60.342499999496425 0.25520583847934036
+  rotation -1.505733553724829e-08 6.049295739929079e-08 -0.9999999999999981 0.26180530717959477
   children [
     DEF ROBOT_BASE Solid {
       translation 0 0 -0.0016935350243008074
@@ -20648,7 +20662,7 @@ DEF DOG Robot {
         }
         HingeJoint {
           jointParameters HingeJointParameters {
-            position 92.50891964804367
+            position 92.50891964805402
             axis 0 1 0
             anchor 0.2 -0.2 -0.15
           }
@@ -20661,7 +20675,7 @@ DEF DOG Robot {
           ]
           endPoint Solid {
             translation 0.20000000000000004 -0.19999999999999996 -0.15000000000000008
-            rotation -0.5127538401399242 0.6070753732382407 -0.6070774173278165 4.089187010044119
+            rotation -0.51275384014389 0.6070753732365657 -0.6070774173261415 4.0891870100504
             children [
               DEF Wheel Shape {
                 appearance MattePaint {
@@ -20678,11 +20692,13 @@ DEF DOG Robot {
             boundingObject USE Wheel_size
             physics Physics {
             }
+            linearVelocity -1.1588782555462165e-08 6.961630097647352e-09 0.0013438313938710532
+            angularVelocity -5.7058087960476273e-08 -9.411129091185453e-08 -2.42380350485477e-13
           }
         }
         HingeJoint {
           jointParameters HingeJointParameters {
-            position 118.46626570584948
+            position 118.46626570588687
             axis 0 1 0
             anchor 0.2 0.2 -0.15
           }
@@ -20695,7 +20711,7 @@ DEF DOG Robot {
           ]
           endPoint Solid {
             translation 0.19999999999999998 0.19999999999999996 -0.15000000000000002
-            rotation -0.8209187449729171 0.4037891257605274 -0.4037904853629412 4.516322870074977
+            rotation -0.8209187449855527 0.4037891257476831 -0.4037904853500968 4.516322870090074
             children [
               USE Wheel
             ]
@@ -20704,11 +20720,13 @@ DEF DOG Robot {
             boundingObject USE Wheel_size
             physics Physics {
             }
+            linearVelocity -1.159586393087824e-08 7.239416184519155e-09 0.0013438231077354586
+            angularVelocity -5.8496213238363245e-08 -9.371573219115507e-08 -2.425254461446542e-13
           }
         }
         HingeJoint {
           jointParameters HingeJointParameters {
-            position 118.47218332050778
+            position 118.47218332054547
             axis 0 1 0
             anchor -0.2 -0.2 -0.15
           }
@@ -20721,7 +20739,7 @@ DEF DOG Robot {
           ]
           endPoint Solid {
             translation -0.19999999999999996 -0.19999999999999996 -0.14999999999999994
-            rotation -0.8229155337383772 0.4017517500876895 -0.4017531028300346 4.518706314731418
+            rotation -0.8229155337510742 0.40175175007468567 -0.40175310281703075 4.5187063147465585
             children [
               USE Wheel
             ]
@@ -20730,11 +20748,13 @@ DEF DOG Robot {
             boundingObject USE Wheel_size
             physics Physics {
             }
+            linearVelocity -1.159615525671222e-08 7.239919491043449e-09 0.0013437884736535912
+            angularVelocity -5.8505023270942994e-08 -9.371333041192146e-08 -2.435815025949304e-13
           }
         }
         HingeJoint {
           jointParameters HingeJointParameters {
-            position 92.5058099824954
+            position 92.50580998250595
             axis 0 1 0
             anchor -0.2 0.2 -0.15
           }
@@ -20747,7 +20767,7 @@ DEF DOG Robot {
           ]
           endPoint Solid {
             translation -0.2 0.19999999999999996 -0.14999999999999997
-            rotation -0.5115618531065855 0.6075779721558171 -0.6075800179377046 4.087298426784388
+            rotation -0.5115618531106271 0.6075779721541157 -0.607580017936003 4.087298426790794
             children [
               USE Wheel
             ]
@@ -20756,6 +20776,8 @@ DEF DOG Robot {
             boundingObject USE Wheel_size
             physics Physics {
             }
+            linearVelocity -1.1589045829319579e-08 6.961478898525768e-09 0.0013437801880232573
+            angularVelocity -5.7052308446700215e-08 -9.411279877750257e-08 -2.4273705060217824e-13
           }
         }
         HingeJoint {
@@ -20876,5 +20898,12 @@ DEF DOG Robot {
   physics Physics {
   }
   controller "<extern>"
+  supervisor TRUE
+  linearVelocity -2.559133787449547e-08 1.5641180997517038e-08 -5.047520614012187e-06
+  angularVelocity -5.7373409213984016e-08 -9.403962121030738e-08 -2.4325525227546426e-13
+}
+Robot {
+  name "ped_obstacle_supervisor"
+  controller "obstacle_course_supervisor"
   supervisor TRUE
 }

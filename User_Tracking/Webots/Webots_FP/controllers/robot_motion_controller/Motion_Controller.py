@@ -122,6 +122,7 @@ class Motion_Controller:
     def get_encoder_reading(self, wheel):
         return 0
 
+    #internal check true if providing position from outside sources
     def set_current_position(self, robot_position, internal_check):
         if internal_check:
             pose = [robot_position[0], robot_position[1]]
@@ -295,7 +296,7 @@ class Motion_Controller:
         self.curr_time = curr_time
         #print(self.current_position)
 
-        if not self.finished_flag :
+        if not self.finished_flag:
 
             if self.curr_time > self.goal_time+0.5:
                 print("missed the target")
@@ -303,7 +304,7 @@ class Motion_Controller:
                     if abs(self.current_position[1] - self.goal_position[1]) <= self.error_epsilon*5:
                         print("Close to Goal")
                         self.at_goal_position() #TODO
-                        return False
+                        #return False
 
             else:
                 if abs(self.current_position[0] - self.goal_position[0]) <= self.error_epsilon:
@@ -311,9 +312,9 @@ class Motion_Controller:
                         if abs(self.current_position[2] - self.goal_position[2]) <= self.heading_epsilon:  # heading error is less important
                             print("At Goal")
                             self.at_goal_position()
-                            return False
+                            #return False
                 else:
                     self.set_velocity(self.x_vel_traj, self.y_vel_traj, self.z_vel_traj)
 
-            return True
+        return self.finished_flag
 

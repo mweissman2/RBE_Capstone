@@ -32,7 +32,7 @@ user_id = user_node.getId()
 #logging data from file
 csv_file = open(cwd + '\\User_Tracking_Data.csv', 'w', newline='')
 csv_writer = csv.writer(csv_file)
-header = ['Actual X Pos', 'Actual Y Pos', 'Measured X Pos', 'Measured Y Pos', 'Timestep', 'Out_of_range', 'Tracking_flag']
+header = ['Actual X Pos', 'Actual Y Pos', 'Measured X Pos', 'Measured Y Pos', 'Timestep', 'Distance', 'Out_of_range', 'Tracking_flag']
 csv_writer.writerow(header)
 
 #enable keboard for exiting program and controlling
@@ -40,8 +40,9 @@ keyboard = Keyboard()
 keyboard.enable(100)
 
 # get the time step of the current world.
-timestep = int(robot.getBasicTimeStep())
-camera_timestep = 32*3
+#timestep = int(robot.getBasicTimeStep())
+timestep = 20
+camera_timestep = 200
 
 #get the wheel objects
 wheels = []
@@ -92,6 +93,7 @@ front_obs_detect = OD.ObstacleDetector(front_camera, front_cam_tf_matrix, camera
 front_obs_detect.camera_location = 'front'
 
 dog_node = robot.getFromDef("DOG")
+robot_orientation = dog_node.getField('rotation')
 
 
 
@@ -103,12 +105,13 @@ vx = 0
 vy = 0
 wz = 0
 first = True
+done_flag = False
 curr_time = 0
 
 while robot.step(timestep) != -1:
     curr_time = robot.getTime()
     robot_location = dog_node.getPosition()
-    obstacle_dictionary = front_obs_detect.get_camera_obstacles(robot_location)
+    robot_angle = robot_orientation.getSFRotation()[3]
 
     #manual control of robot
     key = keyboard.getKey()
@@ -140,10 +143,14 @@ while robot.step(timestep) != -1:
         my_controller.new_plan_trajectory([robot_location[0]-3,robot_location[1]-1,0],8, curr_time)
         first = False
 
-    done_flag = my_controller.move(curr_time, robot_location)
+    if not done_flag:
+        done_flag = my_controller.move(curr_time, robot_location)
+    else:
+        my_controller.set_velocity(vx, vy, wz)
 
 
-    if i == 3:
+    if i == 5:
+        obstacle_dictionary = front_obs_detect.get_camera_obstacles(robot_location)
         measured_position, user_out_of_range, tracking_flag = user_tracker.run()
         #print(measured_position)
         # log data
@@ -157,15 +164,18 @@ while robot.step(timestep) != -1:
         #                                        gps_reference[2],
         #                                    ell)
         curr_time = str(robot.getTime())
-        meas_x_pos = str(measured_position[0]+robot_location[0])
-        meas_y_pos = str(measured_position[1]+robot_location[1])
+        #meas_x_pos = str(measured_position[0]+robot_location[0])
+        meas_x_pos = str(measured_position[0]*np.cos(robot_angle) - measured_position[1]*np.sin(robot_angle) + robot_location[0])
+        #meas_y_pos = str(measured_position[1]+robot_location[1])
+        meas_y_pos = str(measured_position[1]*np.cos(robot_angle) + measured_position[0]*np.sin(robot_angle) + robot_location[1])
+        distance = np.sqrt(np.square(measured_position[0]) + np.square(measured_position[1]))
 
         #get position of user model
         user_position = user_node.getPosition()
         act_x_pos = str(user_position[0])
         act_y_pos = str(user_position[1])
 
-        line = [act_x_pos,act_y_pos, meas_x_pos, meas_y_pos, curr_time, float(user_out_of_range), float(tracking_flag)]
+        line = [act_x_pos,act_y_pos, meas_x_pos, meas_y_pos, curr_time, distance, float(user_out_of_range), float(tracking_flag)]
         csv_writer.writerow(line)
 
         i = 0

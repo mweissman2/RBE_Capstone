@@ -43,15 +43,6 @@ if __name__ == "__main__":
         vo_path_list.append(mplpath.Path(current_cone_vertices))                  # use this to visualize the cone construction
 
 
-    # jordan's obstacle detection gives a center and edge points
-        # need to prepare inputs for it
-    # branch off obstacle_detection to
-    # create obstacle course, use webot protos, use supervisor to pick and place robot
-    # attempt front camera data, run vo-apf at the same time
-
-
-    # create obstacle course for webots
-
     # Extract x and y coordinates from cone_vertices
     # x_coords = [vertex[0] for vertex in cone_vertices_list]
     # y_coords = [vertex[1] for vertex in cone_vertices_list]
@@ -64,7 +55,7 @@ if __name__ == "__main__":
     local_start = [10, -20]
     local_goal = [10, 15]
     grid_size = [50, 50]
-    distance_tolerance = 1.9
+    distance_tolerance = 1.5
     local_planner = APF_Planner(local_start, local_goal, grid_size)
 
     local_planner.repulsive_force(obstacle_coord)       # pass in obstacle coordinates to APF

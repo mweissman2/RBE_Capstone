@@ -278,9 +278,10 @@ class Gimbal_Controller:
         if self.use_estimator:
             self.prev_position = self.estimated_position
         distance = np.sqrt(self.prev_position[0]**2 + self.prev_position[1]**2)
+        [vm, va] = self.velocity_mag_angle()
         if distance > self.max_distance:
             out_of_range_flag = True
-        return self.prev_position, out_of_range_flag, self.tracking_flag
+        return self.prev_position, out_of_range_flag, self.tracking_flag, vm, va
 
     def calculate_user_position_new(self, depth, angle, user_position_on_image):
         #calculates the distance from left to right given the current depth measurement
@@ -293,3 +294,8 @@ class Gimbal_Controller:
         new_position = np.matmul(tf_matrix, position_in_camera_frame)
 
         return new_position[0][0], new_position[1][0]
+
+    def velocity_mag_angle(self):
+        mag = np.sqrt(np.square(self.prev_velocity[0])+np.square(self.prev_velocity[1]))
+        angle = np.arctan2(self.prev_velocity[1],self.prev_velocity[0])
+        return mag, angle

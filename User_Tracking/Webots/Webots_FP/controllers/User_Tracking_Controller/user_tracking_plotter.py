@@ -21,6 +21,8 @@ y_pos_measured = []
 tracking = []
 out_of_range = []
 distance_from_bot = []
+velocity_mag = []
+velocity_angle = []
 
 #header = ['Actual X Pos', 'Actual Y Pos', 'Measured X Pos', 'Measured Y Pos', 'Timestep' 'Out_of_range', 'Tracking Flag']
 
@@ -37,6 +39,8 @@ for row in csv_reader:
     tracking.append(float(row['Tracking_flag']))
     out_of_range.append(float(row['Out_of_range']))
     distance_from_bot.append(float(row['Distance']))
+    velocity_mag.append(float(row['Velocity_mag']))
+    velocity_angle.append(float(row['Velocity_angle']))
 
 
 #convert to np arrays
@@ -56,6 +60,9 @@ y_zero_mean = y_error - np.mean(y_error)
 fig, (ax1, ax2) = plt.subplots(2,1)
 
 ax1.plot(time_actual, x_zero_mean)
+ax1.axhline(y=0.2, color='r', linestyle='--')
+ax1.axhline(y=-0.2, color='r', linestyle='--')
+ax1.set_ylim([-1,1])
 ax1.set_xlabel("Simulation Time")
 ax1.set_ylabel("error (m)")
 ax1.set_title("Position Estimation X Error vs Time")
@@ -70,9 +77,12 @@ plt.show()
 
 fig, (ax1, ax2) = plt.subplots(2,1)
 ax1.plot(time_actual, y_zero_mean)
+ax1.axhline(y=0.2, color='r', linestyle='--')
+ax1.axhline(y=-0.2, color='r', linestyle='--')
 ax1.set_xlabel("Simulation Time")
 ax1.set_ylabel("error (m)")
 ax1.set_title("Position Estimation Y Error vs Time")
+ax1.set_ylim([-1,1])
 ax2.plot(time_actual, y_pos_measured)
 ax2.plot(time_actual, y_pos_actual)
 ax2.plot(time_actual, tracking)
@@ -89,6 +99,15 @@ plt.ylabel("Distance from Robot (Meters)")
 plt.title("Distance from Robot vs Time")
 plt.legend(["Measured Position", 'Out Of Range Flag'])
 plt.show()
+
+plt.plot(time_actual, velocity_mag)
+plt.plot(time_actual, velocity_angle)
+plt.xlabel("Simulation Time")
+plt.ylabel("Velocity Mag/Ang (m/s ; radians)")
+plt.title("Measured Velocity Relative to Robot vs Time")
+plt.legend(["Magnitude", 'Angle'])
+plt.show()
+
 
 
 

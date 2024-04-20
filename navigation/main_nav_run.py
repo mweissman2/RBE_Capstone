@@ -18,11 +18,13 @@ if __name__ == "__main__":
 
     # Below is testing
     robot_velocity = [0,5]
-    robot_pos = [-30,40]
-    robot_goal = [0,0]
-    obstacles = [[10, 10],[-10,5],[6,12]]             # [x y], needs to be list of lists, might need to convert to dictionary later
+    robot_pos = [10,-20]
+    robot_goal = [10,15]
+    obstacles = [[10, 10]]
+    #obstacles = [[10, 10],[-10,5],[6,12]]             # [x y], needs to be list of lists, might need to convert to dictionary later
     obstacle = obstacles[0]
-    o_velocity =[[0,-3],[1,2],[.5,-.5]]
+    o_velocity =[[0,-3]]
+    # o_velocity =[[0,-3],[1,2],[.5,-.5]]
 
 
     # print(routes)
@@ -42,27 +44,21 @@ if __name__ == "__main__":
         cone_vertices_list.append(current_cone_vertices)
         vo_path_list.append(mplpath.Path(current_cone_vertices))                  # use this to visualize the cone construction
 
-
-    # jordan's obstacle detection gives a center and edge points
-        # need to prepare inputs for it
-    # branch off obstacle_detection to
-    # create obstacle course, use webot protos, use supervisor to pick and place robot
-    # attempt front camera data, run vo-apf at the same time
-
-
-    # create obstacle course for webots
-
+    print(f'List of vertices: {cone_vertices_list}')
     # Extract x and y coordinates from cone_vertices
-    # x_coords = [vertex[0] for vertex in cone_vertices_list]
-    # y_coords = [vertex[1] for vertex in cone_vertices_list]
+    x_coords = [vertex[0] for vertex in cone_vertices_list[0]]
+    y_coords = [vertex[1] for vertex in cone_vertices_list[0]]
+    
+    print(f'x-coord: {x_coords}')
+    print(f'y-coord: {y_coords}')
 
 
     o_map.discretize_grid(vo_path_list)           # extract mesh of velocity obstacles
     obstacle_coord = o_map.list_of_obstacle_coordinates
     # APF section
 
-    local_start = [10, -20]
-    local_goal = [10, 15]
+    local_start = robot_pos #[10, -20]
+    local_goal = robot_goal #[10, 15]
     grid_size = [50, 50]
     distance_tolerance = 1.9
     local_planner = APF_Planner(local_start, local_goal, grid_size)
@@ -71,12 +67,14 @@ if __name__ == "__main__":
     local_planner.attractive_force()            # currently has issue with distance calculation
     local_planner.plot_field(obstacle_coord)
     local_path = local_planner.path_finder(distance_tolerance)                 # find the path and
-    x_path = [coord[0] for coord in local_path]
-    y_path = [coord[1] for coord in local_path]
-    plt.plot(x_path, y_path, linestyle='-', color='b', label='Coordinates')
-    print(local_path)
+    # x_path = [coord[0] for coord in local_path]
+    # y_path = [coord[1] for coord in local_path]
     nav_end_time = time.time()
     result_time = nav_end_time - nav_start_time
+    print(f'THis is the comp time: {result_time}')
+    # plt.plot(x_path, y_path, linestyle='-', color='b', label='Coordinates')
+    # print(local_path)
+    
 
 
     # saving data
@@ -98,10 +96,14 @@ if __name__ == "__main__":
 
 
     # Plot the points
-    # plt.figure()
-    # plt.plot(x_coords, y_coords, 'ro')  # 'ro' specifies red circles for points
-    # plt.plot(*robot_pos,'bo')
-    # plt.scatter(50,60, color = 'green')
+    plt.figure()
+    for obs in obstacles:
+        plt.plot(obs[0],obs[1],'ro')
+    plt.plot(x_coords, y_coords, 'mo')  # 'ro' specifies red circles for points
+    plt.plot(*robot_pos,'go')
+    plt.ylim([-50,50])
+    plt.xlim([-50,50])
+    plt.scatter(robot_goal[0],robot_goal[1],color = 'blue')
     # # Plot the path between vertices
     # for i in range(len(cone_vertices_list) - 1):
     #   plt.plot([cone_vertices_list[i][0], cone_vertices_list[i + 1][0]], [cone_vertices_list[i][1], cone_vertices_list[i + 1][1]], 'r-')

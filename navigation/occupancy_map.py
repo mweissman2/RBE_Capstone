@@ -37,7 +37,7 @@ class OccupancyMap:
                     if object_detected:
                         self.occupancy_grid[i][k] = 1
                         # print(f'Point {[i,k]} is inside the VO')
-                        self.list_of_obstacle_coordinates.append([k,i])
+                        self.list_of_obstacle_coordinates.append([i,k])
                     else:
                         self.occupancy_grid[i][k] = 0
                         # print('Not inside VO')

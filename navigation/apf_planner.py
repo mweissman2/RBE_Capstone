@@ -91,11 +91,12 @@ class APF_Planner:
 
         # Add goal
         ax.add_patch(plt.Circle(self.goal, 0.5, color='b'))
+        ax.add_patch(plt.Circle(self.start, 0.5, color='g'))
         ax.annotate("Goal", xy=self.goal, fontsize=10, ha="center")
         for obs in obstacles:
             # plot all the obstacles
-            ax.add_patch(plt.Circle(obs, 0.5, color='r'))
-            ax.annotate(f"Obstacle {obs}", xy = obs,fontsize=10, ha = "center")
+            ax.add_patch(plt.Circle(obs, 0.5, color='m'))
+            # ax.annotate(f"Obstacle {obs}", xy = obs,fontsize=10, ha = "center")
         ax.set_title('vector field of Goal and Obstacles')
         # self.stream_path = plt.streamplot(self.X, self.Y, self.i_vector, self.j_vector, start_points = np.array(self.start).reshape(1,2),density = 1)
 

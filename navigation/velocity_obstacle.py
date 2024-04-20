@@ -1,5 +1,6 @@
 # Code for VO and eventually APF implementation
 import math
+from tkinter import HORIZONTAL
 
 # some notes on VO: https://egreuel.github.io/asv_path_planner/Introduction.html#velocity-obstacle-algorithm
 
@@ -22,7 +23,7 @@ import matplotlib.path as mplpath
 
 # for testing, we can just use webots omnipresent knowledge of obstacle positions
 class velocityObstacle():
-    def __init__(self):
+    def __init__(self,t_horizon):
         self.obstacles = {}                 # dict of webots world obstacles, key = obstacle id, value = velocity vector
         self.v_obstacles = []               # list to contain velocity obstacles
         self.time_to_collide = 5            # this is an arbitrary buffer value for collision time tolerance
@@ -34,7 +35,7 @@ class velocityObstacle():
 
         # maybe a simple 2D test matrix to represent the world
         self.test_world = np.zeros((80,80), dtype=int)
-
+        self.time_horizon = t_horizon
 
 
     def pyth_distance(self,point_1,point_2):
@@ -47,10 +48,10 @@ class velocityObstacle():
         local_occupy_map is the matrix that will contain the obstacles surrounding the robot
         t_1 and t_2 are the tangent points connected to the
         '''
-        time_horizon = 3           # this establishes 6 second future horizon window
+        time_horizon = self.time_horizon           # this establishes 6 second future horizon window
         new_t1 = [t_1[0] + velocity_of_obstacle[0]*time_horizon,t_1[1] + velocity_of_obstacle[1]*time_horizon]
         new_t2 = [t_2[0] + velocity_of_obstacle[0]*time_horizon,t_2[1] + velocity_of_obstacle[1]*time_horizon]
-        new_apex_point = [(robo_velocity[0] - velocity_of_obstacle[0])*time_horizon+robot_pos[0],(robo_velocity[0] - velocity_of_obstacle[0])*time_horizon+robot_pos[0]]      # the apex point of the obstacle would be vector shift of robot position by velocity of object minus distance covered from difference of obstacle and robot velocities.
+        new_apex_point = [(robo_velocity[0] - velocity_of_obstacle[0])*time_horizon+robot_pos[0],(robo_velocity[1] - velocity_of_obstacle[1])*time_horizon+robot_pos[1]]      # the apex point of the obstacle would be vector shift of robot position by velocity of object minus distance covered from difference of obstacle and robot velocities.
         cone_vertices = np.array([new_apex_point,new_t1,new_t2])
 
         return cone_vertices

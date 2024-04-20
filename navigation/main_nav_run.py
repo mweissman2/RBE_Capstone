@@ -19,25 +19,26 @@ if __name__ == "__main__":
     # Below is testing
     robot_velocity = [0,5]
     robot_pos = [10,-20]
-    robot_goal = [10,15]
-    obstacles = [[10, 10]]
-    #obstacles = [[10, 10],[-10,5],[6,12]]             # [x y], needs to be list of lists, might need to convert to dictionary later
+    robot_goal = [-10,20]
+    #obstacles = [[10, 10]]
+    obstacles = [[10, 10],[-10,5],[6,12]]             # 12 = 100%, 6 = 50%, 
     obstacle = obstacles[0]
-    o_velocity =[[0,-3]]
-    # o_velocity =[[0,-3],[1,2],[.5,-.5]]
+    #o_velocity =[[0,-3]]
+    o_velocity =[[0,3],[-1,-2],[1,-1]]
 
 
     # print(routes)
     cone_vertices_list = []
     vo_path_list = []
 
-    nav_start_time = time.time()
-    vo_algo = velocityObstacle()
+    time_h = 1
+    vo_algo = velocityObstacle(time_h)
     o_map = OccupancyMap(100,100)       # this is where the occupancy map would go in
     # o_map.test_grid()    # create test grid
 
     inflate_radius = 3
 
+    vo_start_time = time.time()
     vo_algo.update_obstacles(obstacles,inflate_radius)         # also add argument for the radius of the obstacles
     for i in range(len(obstacles)):
         current_cone_vertices = vo_algo.vo_calculation(o_map.occupancy_grid, robot_pos, o_velocity[i], robot_velocity)
@@ -46,60 +47,66 @@ if __name__ == "__main__":
 
     print(f'List of vertices: {cone_vertices_list}')
     # Extract x and y coordinates from cone_vertices
-    x_coords = [vertex[0] for vertex in cone_vertices_list[0]]
-    y_coords = [vertex[1] for vertex in cone_vertices_list[0]]
+    x_coords = []
+    y_coords = []
+    for i in cone_vertices_list:
+        x_coords.append([vertex[0] for vertex in i])
+        y_coords.append([vertex[1] for vertex in i])
     
     print(f'x-coord: {x_coords}')
     print(f'y-coord: {y_coords}')
 
-
+    vo_end_time = time.time()                   # end vo calculation 
+    
     o_map.discretize_grid(vo_path_list)           # extract mesh of velocity obstacles
     obstacle_coord = o_map.list_of_obstacle_coordinates
+    
     # APF section
-
+    apf_time = time.time()
     local_start = robot_pos #[10, -20]
     local_goal = robot_goal #[10, 15]
-    grid_size = [50, 50]
+    grid_size = [60, 60]
     distance_tolerance = 1.9
     local_planner = APF_Planner(local_start, local_goal, grid_size)
 
     local_planner.repulsive_force(obstacle_coord)       # pass in obstacle coordinates to APF
     local_planner.attractive_force()            # currently has issue with distance calculation
-    local_planner.plot_field(obstacle_coord)
     local_path = local_planner.path_finder(distance_tolerance)                 # find the path and
-    # x_path = [coord[0] for coord in local_path]
-    # y_path = [coord[1] for coord in local_path]
-    nav_end_time = time.time()
-    result_time = nav_end_time - nav_start_time
+    x_path = [coord[0] for coord in local_path]
+    y_path = [coord[1] for coord in local_path]
+    apf_end_time = time.time()                              # end time
+    result_time = (apf_end_time - apf_time) +(vo_start_time-vo_end_time)
+    print(f'')
     print(f'THis is the comp time: {result_time}')
-    # plt.plot(x_path, y_path, linestyle='-', color='b', label='Coordinates')
+    local_planner.plot_field(obstacle_coord)
+    plt.plot(x_path, y_path, linestyle='-', color='b', label='Coordinates')
     # print(local_path)
     
 
 
     # saving data
     # File path
-    file_path = "apf_vo_time_data.txt"
+   #  file_path = "apf_vo_time_data.txt"
 
     # Open the file in append mode (create if not exist)
-    with open(file_path, 'a+') as file:
+  #  with open(file_path, 'a+') as file:
         # Move the cursor to the start of the file
-        file.seek(0)
+       # file.seek(0)
         # Check if the file is empty
-        if not file.read():
+       # if not file.read():
             # If the file is empty, write the variable's value to the file
-            file.write(f'{nav_start_time},{result_time}')
-        else:
+            # file.write(f'{nav_start_time},{result_time}')
+        # #else:
             # If the file is not empty, move the cursor to the end of the file and add a new line before writing
-            file.seek(0, 2)
-            file.write('\n' + f'{nav_start_time},{result_time}')
+            # file.seek(0, 2)
+            # file.write('\n' + f'{nav_start_time},{result_time}')
 
 
     # Plot the points
     plt.figure()
     for obs in obstacles:
         plt.plot(obs[0],obs[1],'ro')
-    plt.plot(x_coords, y_coords, 'mo')  # 'ro' specifies red circles for points
+    plt.plot(x_coords, y_coords, 'mx')  # 'ro' specifies red circles for points
     plt.plot(*robot_pos,'go')
     plt.ylim([-50,50])
     plt.xlim([-50,50])

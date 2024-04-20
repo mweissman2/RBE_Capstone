@@ -32,6 +32,7 @@ class OccupancyMap:
         # 0 is free space and 1 is occupied 
         for i in range(0,self.width):
             for k in range(0,self.length):
+                #if i%2 ==0:
                 for polygon in obstacle_paths:
                     object_detected = polygon.contains_point([i,k])
                     if object_detected:
@@ -41,8 +42,8 @@ class OccupancyMap:
                     else:
                         self.occupancy_grid[i][k] = 0
                         # print('Not inside VO')
-        plt.figure()
-        plt.imshow(self.occupancy_grid, origin='lower')
+       #  plt.figure()
+        # plt.imshow(self.occupancy_grid, origin='lower')
         #for i in range(0,self.width):
          #   for k in range(0,self.length):
           #      if self.occupancy_grid[i][k] == 1:

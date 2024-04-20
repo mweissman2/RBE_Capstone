@@ -6,6 +6,7 @@ from controller import Robot
 from controller import Supervisor
 from controller import Keyboard
 from Communication.CommsManager import *
+from Communication.Comms_output.Text_to_speech import tts_via_request
 from navigation.global_planner import google_planner, latlong2string, extract_waypoints
 from multiprocessing import Process, Queue
 import pymap3d
@@ -163,6 +164,7 @@ def main():
             waypoints = find_waypoints(world_node, current_pos, destination)
             spawn_waypoints(waypoints, children_field)
             spawn_lines(latlong_2_pos(world_node, current_pos), latlong_2_pos(world_node, destination), waypoints, children_field)
+            tts_via_request("Route plotted, let me know when you're ready to go")
 
         # i += 1
         # key = keyboard.getKey()

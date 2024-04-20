@@ -39,8 +39,8 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation 0.04900220781412239 0.879827224927391 0.47276086757038976 0.997678862278685
-  position -9.480018203700359 -9.925773499592259 15.789238782960167
+  orientation -0.13466066694289572 0.5766628554262906 -0.8058079522752873 0.37102888332405465
+  position -11.98587033892705 2.6886871133367345 3.273872551579492
 }
 TexturedBackground {
 }
@@ -55,7 +55,7 @@ DEF USER Pedestrian {
   enableBoundingObject TRUE
 }
 Solid {
-  translation 0.67 0 0.09342527489456763
+  translation 0.67 0 0.09342572594794567
   children [
     Shape {
       appearance PBRAppearance {
@@ -68,13 +68,14 @@ Solid {
   boundingObject USE BALL_GEOMETRY
   physics Physics {
   }
+  linearVelocity 0 0 -3.681158500848673e-06
 }
 DEF DOG Robot {
-  translation -1.87162 -0.422355 0.273372
-  rotation 0.0038922301359185247 -0.005364720187338576 0.9999780349197078 0.262314
+  translation -6.351291862243846 -0.07052626902822112 0.267871416195447
+  rotation -0.000589583648295652 -0.004168096509033302 -0.9999911396420536 0.49992085457418534
   children [
     DEF ROBOT_BASE Solid {
-      translation 0 0 -0.0016935350243008074
+      translation 3.5 0.39 -0.00169354
       children [
         InertialUnit {
           name "imu"
@@ -117,6 +118,14 @@ DEF DOG Robot {
               translation 0 0 -0.025
               rotation 0 1 0 1.5708
               name "front_camera"
+              fieldOfView 1.52
+              width 640
+              height 480
+              recognition Recognition {
+                maxRange 20
+                frameThickness 3
+                segmentation TRUE
+              }
             }
           ]
           name "Front_Camera_Solid"
@@ -141,7 +150,7 @@ DEF DOG Robot {
         }
         HingeJoint {
           jointParameters HingeJointParameters {
-            position -9.998336398374066
+            position -111.75382218664942
             axis 0 1 0
             anchor 0.2 -0.2 -0.15
           }
@@ -153,8 +162,8 @@ DEF DOG Robot {
             }
           ]
           endPoint Solid {
-            translation 0.20000000000000007 -0.19999999999999996 -0.15
-            rotation 0.204140819124293 0.6922150313239396 -0.6922173620882822 2.738846117967638
+            translation 0.2 -0.19999999999999996 -0.1499999999999999
+            rotation 0.6645406989081559 0.5283861179817915 -0.5283878971161168 1.9685370874843524
             children [
               DEF Wheel Shape {
                 appearance MattePaint {
@@ -171,11 +180,13 @@ DEF DOG Robot {
             boundingObject USE Wheel_size
             physics Physics {
             }
+            linearVelocity 3.4621552636146395e-14 2.0484979416215438e-14 -6.022001552285058e-16
+            angularVelocity 2.280754976617788e-13 4.125763863132574e-13 1.2465823924311776e-13
           }
         }
         HingeJoint {
           jointParameters HingeJointParameters {
-            position 15.95901205201921
+            position 4.868619624213832
             axis 0 1 0
             anchor 0.2 0.2 -0.15
           }
@@ -187,8 +198,8 @@ DEF DOG Robot {
             }
           ]
           endPoint Solid {
-            translation 0.20000000000000007 0.19999999999999996 -0.15
-            rotation -0.0888753320461009 0.7043074026464787 -0.7043097741271707 3.3188769223454373
+            translation 0.2 0.19999999999999996 -0.15000000000000005
+            rotation -0.6373937128434148 0.5448519320325379 -0.5448537666090759 4.276513696430008
             children [
               USE Wheel
             ]
@@ -197,11 +208,13 @@ DEF DOG Robot {
             boundingObject USE Wheel_size
             physics Physics {
             }
+            linearVelocity -4.720336447134244e-15 4.529878202237573e-14 -4.180292327891502e-18
+            angularVelocity -2.3475509866719095e-13 -4.2785077008941617e-13 1.2604588670535964e-13
           }
         }
         HingeJoint {
           jointParameters HingeJointParameters {
-            position 15.96491625001047
+            position -68.25552450076422
             axis 0 1 0
             anchor -0.2 -0.2 -0.15
           }
@@ -213,8 +226,8 @@ DEF DOG Robot {
             }
           ]
           endPoint Solid {
-            translation -0.20000000000000007 -0.19999999999999996 -0.15
-            rotation -0.09097113927173014 0.7041735981206306 -0.7041759691507855 3.3230348992521543
+            translation -0.19999999999999996 -0.19999999999999996 -0.15000000000000002
+            rotation -0.8391442389911078 -0.3846010595760833 0.38460235457026076 4.537905091934368
             children [
               USE Wheel
             ]
@@ -223,11 +236,13 @@ DEF DOG Robot {
             boundingObject USE Wheel_size
             physics Physics {
             }
+            linearVelocity 1.878754528942712e-14 -2.4300093971232474e-14 -7.870355087261203e-16
+            angularVelocity 1.4757272145238349e-13 2.677353616496361e-13 1.2535477243940662e-13
           }
         }
         HingeJoint {
           jointParameters HingeJointParameters {
-            position -10.001474225804698
+            position -20.172713371720043
             axis 0 1 0
             anchor -0.2 0.2 -0.15
           }
@@ -239,8 +254,8 @@ DEF DOG Robot {
             }
           ]
           endPoint Solid {
-            translation -0.20000000000000004 0.19999999999999996 -0.15000000000000005
-            rotation 0.2052722214116608 0.692047718690964 -0.6920500488919529 2.736674328892282
+            translation -0.2 0.19999999999999996 -0.14999999999999994
+            rotation -0.672285175851617 0.5234648016089157 -0.5234665641726308 4.325354056731807
             children [
               USE Wheel
             ]
@@ -249,10 +264,13 @@ DEF DOG Robot {
             boundingObject USE Wheel_size
             physics Physics {
             }
+            linearVelocity -3.425027170656649e-14 -8.001530034741481e-16 -6.927655217854626e-16
+            angularVelocity -1.8558349131580678e-13 -3.516310460121396e-13 1.2535477647064816e-13
           }
         }
         HingeJoint {
           jointParameters HingeJointParameters {
+            position -96.4556062499997
             axis 0 0 1
             anchor -0.12 0 0.2
           }
@@ -265,10 +283,11 @@ DEF DOG Robot {
           ]
           endPoint Solid {
             translation -0.12 0 0.2
-            rotation 9.024993567198802e-17 1 0 4.692706653739929e-06
+            rotation -2.3463533268661704e-06 -1.182681301825694e-06 0.9999999999965479 4.075358664870905
             children [
               HingeJoint {
                 jointParameters HingeJointParameters {
+                  position -0.8462499999999997
                   axis 0 1 0
                   anchor 0 0 0.08
                   minStop -0.52
@@ -283,7 +302,7 @@ DEF DOG Robot {
                 ]
                 endPoint Solid {
                   translation 0 0 0.08
-                  rotation 1 0 0 1.5707999999999998
+                  rotation 0.8434733407723147 -0.3798365855819146 0.37983798080216163 1.7402107187731326
                   children [
                     Solid {
                       rotation 1 0 0 -1.5707953071795862
@@ -368,8 +387,10 @@ DEF DOG Robot {
   ]
   physics Physics {
   }
-  controller "<none>"
+  controller "<extern>"
   supervisor TRUE
+  linearVelocity 6.755016747981492e-15 3.1157702680543894e-15 -6.614506921984933e-17
+  angularVelocity -6.433937781016568e-16 4.6483103637276955e-17 1.2473590395565772e-13
 }
 Robot {
   translation 0.1 0 0.1

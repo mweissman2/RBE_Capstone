@@ -17,7 +17,7 @@ class ObstacleDetector:
         self.accuracy = 0.1
         self.chance_of_no_detection = 0.9
         self.time_step = sample_period
-        self.max_distance = 10 #meters distance away from obstacle before it is removed from occupancy list
+        self.max_distance = 20 #meters distance away from obstacle before it is removed from occupancy list
 
 
         #dictionary for storing different camera objects seen
@@ -64,7 +64,7 @@ class ObstacleDetector:
                     self.camera_objects[id] = new_data
 
         #prune obstacle list to get rid of old obstacles
-        self.prune_obstacles(self.max_distance)
+        # self.prune_obstacles(self.max_distance)
         return self.camera_objects.copy()
 
     #translates lidar point cloud to obstacles in the configuration space.
@@ -130,6 +130,10 @@ class ObstacleDetector:
         zvel = np.round(((new_position[2]-old_position[2]) / self.time_step), 3)
 
         return [xvel,yvel,zvel]
+
+    def get_camera_context(self):
+        camera_context = [[obj[4], obj[5]] for obj in self.camera_objects.values()]
+        return camera_context
 
 
 

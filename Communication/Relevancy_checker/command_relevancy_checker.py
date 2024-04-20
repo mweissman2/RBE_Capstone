@@ -79,7 +79,7 @@ def relevancy_check(input_str: str, func_list: list, func_embeddings, example_em
             max_similarity = similarity
             most_relevant_command = func
 
-    print(f'max similarity: {max_similarity}')
+    # print(f'max similarity: {max_similarity}')
     if max_similarity > 0.70:
         return True
     else:
